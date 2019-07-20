@@ -1,0 +1,26 @@
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS game;
+DROP TABLE IF EXISTS result;
+
+CREATE TABLE user (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
+);
+
+CREATE TABLE game (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    datestamp DATE NOT NULL DEFAULT CURRENT_DATE,
+    map TEXT,
+    winner INTEGER,
+    FOREIGN KEY (winner) REFERENCES user (id)
+);
+
+CREATE TABLE result (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    score INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id),
+    FOREIGN KEY (game_id) REFERENCES game (id)
+);
