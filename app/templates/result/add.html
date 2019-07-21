@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Dodaj wynik{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<h2>W jaki sposób chcesz dodać wynik?</h2>
+<br>
+<div class="text-center">
+    <a href="{{ url_for('result.add_manually') }}" class="mr-5"><button type="button" class="btn btn-outline-danger btn-lg">Ręcznie</button></a>
+    <a href="{{ url_for('result.add_manually') }}" class="ml-5"><button type="button" class="btn btn-outline-danger btn-lg">Z linku</button></a>
+</div>
+{% endblock %}

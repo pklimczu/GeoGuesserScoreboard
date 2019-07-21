@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Dodaj wynik ręcznie{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="alert alert-dark" role="alert">
+    <h4 class="alert-heading">Uwaga</h4>
+    Wstaw "x" jeśli któryś z poniższych graczy postanowił tym razem nie grać
+</div>
+<form method="post">
+<div class="form-group row">
+    <label for='map' class="col-sm-2 col-form-label"><b>Link do mapy:</b></label>
+    <div class="col-sm-3">
+        <input class="form-control" name='map' id='map'>
+    </div>
+</div>
+<hr>
+{% for user in users %}
+<div class="form-group row">
+    <label for='input_{{ user.id }}' class="col-sm-2 col-form-label">{{ user.username }}:</label>
+    <div class="col-sm-3">
+        <input class="form-control" name='input_{{ user.id }}' id='input_{{ user.id }}'>
+    </div>
+</div>
+{% endfor %}
+<input type='submit' class="btn btn-dark" value='Dodaj'>
+</form>
+{% endblock %}

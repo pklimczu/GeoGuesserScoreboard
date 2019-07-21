@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, render_template
+from app.db import get_db
 
 def create_app(test_config=None):
     # create and configure the app
@@ -28,10 +29,15 @@ def create_app(test_config=None):
     def index(error=None):
         if error:
             flash(error)
-        return render_template('index.html')
+        db = get_db()
+        users = db.execute('SELECT * FROM user').fetchall()
+        games = db.execute('SELECT * FROM game').fetchall()
+        results = db.execute('SELECT * FROM result').fetchall()
+        return render_template('index.html', users=users, games=games, results=results)
 
-    from . import db, auth
+    from . import db, auth, result
     db.init_app(app)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(result.bp)
 
     return app

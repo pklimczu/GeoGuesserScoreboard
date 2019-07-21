@@ -26,7 +26,7 @@ def register():
                 elif db.execute(
                     'SELECT id FROM user WHERE username = ?', (username,)
                 ).fetchone() is not None:
-                    error = 'User {} is already registered!'.format(username)
+                    error = 'Użytkownik {} jest już stworzony!'.format(username)
                 
                 if error is None:
                     db.execute(
@@ -34,12 +34,13 @@ def register():
                         (username, generate_password_hash(password))
                     )
                     db.commit()
-                    return redirect(url_for('auth.login'))
+                    flash("Użytkownik {} dodany!".format(username))
+                    return render_template('auth/register.html')
+                flash(error)
     else:
         flash("Tylko admin może dodawać użytkowników!")
         return redirect(url_for('index'))
 
-        flash(error)
     return render_template('auth/register.html')
 
 @bp.route('/login', methods=('GET', 'POST'))

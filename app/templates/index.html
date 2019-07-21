@@ -1,5 +1,66 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>Żegnaj</p>
+<h1>Users</h1>
+<table class="table table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Username</th>
+            <th scope="col">Password</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+        <tr>
+            <th scope="row">{{ user.id }}</th>
+            <td>{{ user.username }}</td>
+            <td>{{ user.password }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr>
+<h1>Games</h1>
+<table class="table table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Datestamp</th>
+            <th scope="col">Map</th>
+            <th scope="col">Winner</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for game in games %}
+        <tr>
+            <th scope="row">{{ game.id }}</th>
+            <td>{{ game.datestamp }}</td>
+            <td>{{ game.map }}</td>
+            <td>{{ game.winner }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr>
+<h1>Results</h1>
+<table class="table table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">user_id</th>
+            <th scope="col">Password</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for result in results %}
+        <tr>
+            <th scope="row">{{ result.id }}</th>
+            <td>{{ result.user_id }}</td>
+            <td>{{ result.game_id }}</td>
+            <td>{{ result.score }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
