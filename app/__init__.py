@@ -29,11 +29,7 @@ def create_app(test_config=None):
     def index(error=None):
         if error:
             flash(error)
-        db = get_db()
-        users = db.execute('SELECT * FROM user').fetchall()
-        games = db.execute('SELECT * FROM game').fetchall()
-        results = db.execute('SELECT * FROM result').fetchall()
-        return render_template('index.html', users=users, games=games, results=results)
+        return render_template('index.html')
 
     from . import db, auth, result
     db.init_app(app)
