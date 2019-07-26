@@ -12,12 +12,13 @@
         <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 {% if g.user %}
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('result.all_results') }}"><button class="btn btn-outline-light">wszystkie wyniki</button></a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('result.all_results') }}"><button class="btn btn-outline-light">wyniki</button></a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('result.add') }}"><button class="btn btn-outline-light">dodaj wynik</button></a></li>
                 {% endif %}
                 {% if g.user['username'] == 'admin' %}
                 <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}"><button class="btn btn-outline-light">dodaj użytkownika</button></a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}"><button class="btn btn-outline-light">użytkownicy</button></a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('manage.users') }}"><button class="btn btn-outline-light">użytkownicy</button></a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('manage.dump_database') }}"><button class="btn btn-outline-light">techniczna</button></a></li>
                 {% endif %} 
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -38,10 +39,8 @@
             {{ message }}
         </div>
         {% endfor %}
-        <hr>
-        {% block header %}{% block title %}{% endblock %}{% endblock %}
+        {% block header %}<hr><h1>{% block title %}{% endblock %}</h1><hr>{% endblock %}
         <section class="content">
-            <hr>
             {% block content %}{% endblock %}
         </section>
     </div>

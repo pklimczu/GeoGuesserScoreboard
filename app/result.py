@@ -29,10 +29,9 @@ def add():
 @bp.route('/all_results')
 def all_results():
     db = get_db()
-    users = db.execute('SELECT * FROM user').fetchall()
     games = db.execute('SELECT * FROM game').fetchall()
     results = db.execute('SELECT * FROM result').fetchall()
-    return render_template('result/all_results.html', users=users, games=games, results=results)
+    return render_template('result/all_results.html', games=games, results=results)
 
 @bp.route('/add_manually', methods=('GET', 'POST'))
 def add_manually():
