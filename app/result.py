@@ -13,13 +13,15 @@ def get_winner_and_results(request_form):
     winner = ["",0]
     results = []
     for entry in list(request_form)[1:]:
-        user = db.execute('SELECT id, username FROM user WHERE id = ?', (entry.split("_")[-1])).fetchone()
-        username = user['username']
-        user_id = user['id']
-        score = int(request_form[entry])
-        results.append((user_id, score))
-        if winner[1] < score:
-            winner = [username, score]
+        if (str(request_form[entry]).isdigit()):
+            user_id = str(entry.split("_")[-1])
+            score = int(request_form[entry])
+            results.append((user_id, score))
+            if winner[1] < score:
+                command = "SELECT id, username FROM user WHERE id = {}".format(user_id)
+                user = db.execute(command).fetchone()
+                username = user['username']
+                winner = [username, score]
     return (winner, results)
 
 @bp.route('/add')
@@ -39,8 +41,6 @@ def add_manually():
     if request.method == 'POST':
         played_map = request.form['map']
         winner, results = get_winner_and_results(request.form)
-        print("winner", winner)
-        print("results", results)
         cur = db.execute(
             'INSERT INTO game (map, winner) VALUES (?, ?)',
              (played_map, winner[0])
