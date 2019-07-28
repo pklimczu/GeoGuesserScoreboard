@@ -11,6 +11,7 @@
             <th scope="col">datestamp</th>
             <th scope="col">map</th>
             <th scope="col">winner</th>
+            <th scope="col">remove</th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +21,7 @@
             <td>{{ game.datestamp }}</td>
             <td>{{ game.map }}</td>
             <td>{{ game.winner }}</td>
+            <td><a href="{{ url_for('manage.remove_entry', database='game', id=game.id) }}">remove</a></td>
         </tr>
     {% endfor %}
     </tbody>
@@ -33,6 +35,7 @@
             <th scope="col">user_id</th>
             <th scope="col">game_id</th>
             <th scope="col">score</th>
+            <th scope="col">remove</th>
         </tr>
     </thead>
     <tbody>
@@ -42,6 +45,7 @@
             <td>{{ result.user_id }}</td>
             <td>{{ result.game_id }}</td>
             <td>{{ result.score }}</td>
+            <td><a href="{{ url_for('manage.remove_entry', database='result', id=result.id) }}">remove</a></td>
         </tr>
     {% endfor %}
     </tbody>

@@ -1,47 +1,65 @@
 {% extends 'base.html' %}
-{% block title %}Wszystkie wyniki{% endblock %}
+{% block header %}<hr>{% endblock %}
 {% block content %}
-<h1>Games</h1>
+<h2>Wyniki według klasyfikacji klasycznej</h2>
+<h3>Ostatni miesiąc</h3>
 <table class="table table-hover table-sm">
     <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
-            <th scope="col">datestamp</th>
-            <th scope="col">map</th>
-            <th scope="col">winner</th>
+            <th scope="col">użytkownik</th>
+            <th scope="col">liczba zwycięstw</th>
         </tr>
     </thead>
     <tbody>
-    {% for game in games %}
-        <tr>
-            <th scope="row">{{ game.id }}</th>
-            <td>{{ game.datestamp }}</td>
-            <td>{{ game.map }}</td>
-            <td>{{ game.winner }}</td>
+    {% for entry in current_month %}
+        <tr {% if loop.first %}class="table-success"{% endif %}>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ entry[0] }}</td>
+            <td>{{ entry[1] }}</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
 <hr>
-<h1>Results</h1>
+<h3>Przedostatni miesiąc</h3>
 <table class="table table-hover table-sm">
     <thead class="thead-dark">
         <tr>
             <th scope="col">#</th>
-            <th scope="col">user_id</th>
-            <th scope="col">game_id</th>
-            <th scope="col">score</th>
+            <th scope="col">użytkownik</th>
+            <th scope="col">liczba zwycięstw</th>
         </tr>
     </thead>
     <tbody>
-    {% for result in results %}
-        <tr>
-            <th scope="row">{{ result.id }}</th>
-            <td>{{ result.user_id }}</td>
-            <td>{{ result.game_id }}</td>
-            <td>{{ result.score }}</td>
+    {% for entry in last_month %}
+        <tr {% if loop.first %}class="table-success"{% endif %}>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ entry[0] }}</td>
+            <td>{{ entry[1] }}</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
+<hr>
+<h3>Tabela historyczna</h3>
+<table class="table table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">użytkownik</th>
+            <th scope="col">liczba zwycięstw</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for entry in all_time %}
+        <tr {% if loop.first %}class="table-success"{% endif %}>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ entry[0] }}</td>
+            <td>{{ entry[1] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr>
 {% endblock %}

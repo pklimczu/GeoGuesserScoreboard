@@ -14,13 +14,6 @@ def users():
     users = db.execute('SELECT * FROM user').fetchall()
     return render_template('manage/users.html', users=users)
 
-@bp.route('/dump_database')
-def dump_database():
-    db = get_db()
-    games = db.execute('SELECT * FROM game').fetchall()
-    results = db.execute('SELECT * FROM result').fetchall()
-    return render_template('manage/dump_database.html', games=games, results=results)
-
 @bp.route('/remove_user/<username>')
 def remove_user(username):
     db = get_db()
@@ -30,3 +23,21 @@ def remove_user(username):
     db.commit()
     flash("Użytkownik {} został usunięty!".format(username))
     return redirect(url_for('manage.users'))
+
+@bp.route('/dump_database')
+def dump_database():
+    db = get_db()
+    games = db.execute('SELECT * FROM game').fetchall()
+    results = db.execute('SELECT * FROM result').fetchall()
+    return render_template('manage/dump_database.html', games=games, results=results)
+
+@bp.route('/remove_entry/<database>:<id>')
+def remove_entry(database, id):
+    database = escape(database)
+    id = escape(id)
+    formula = "DELETE FROM {} WHERE id = '{}'".format(database, id)
+    db = get_db()
+    db.execute(formula)
+    db.commit()
+    flash("Wpis usunięty!")
+    return redirect(url_for('manage.dump_database'))
