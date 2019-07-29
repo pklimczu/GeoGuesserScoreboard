@@ -1,10 +1,10 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, escape
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, escape, abort
 )
 
-from app.db import get_db
+from app.db import get_db, init_db_command
 
 bp = Blueprint('manage', __name__, url_prefix='/manage')
 
@@ -41,3 +41,33 @@ def remove_entry(database, id):
     db.commit()
     flash("Wpis usunięty!")
     return redirect(url_for('manage.dump_database'))
+
+@bp.route('/control_panel')
+def control_panel():
+    return render_template('manage/control_panel.html')
+
+@bp.route('/reset_db')
+def reset_db():
+    if g.user['username'] == 'admin':
+        print("DUPA")
+        init_db_command()
+        flash("Baza danych została zresetowana")
+        return redirect(url_for('manage.control_panel'))
+    else:
+        return abort(404)
+
+@bp.route('/create_backup')
+def create_backup():
+    if g.user['username'] == 'admin':
+
+        return redirect(url_for('manage.control_panel'))
+    else:
+        return abort(404)
+
+@bp.route('/load_backup')
+def load_backup():
+    if g.user['username'] == 'admin':
+
+        return redirect(url_for('manage.control_panel'))
+    else:
+        return abort(404)

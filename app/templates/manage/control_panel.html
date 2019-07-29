@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel użytkownika{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    {% if g.user['username'] == 'admin' %}
+    <a href="{{ url_for('manage.reset_db') }}" class="mr-5"><button type="button" class="btn btn-outline-danger btn-lg">Zresetuj bazę danych</button></a><br><br>
+    <a href="#" class="mr-5"><button type="button" class="btn btn-outline-danger btn-lg">Utwórz kopię</button></a><br><br>
+    <a href="#" class="mr-5"><button type="button" class="btn btn-outline-danger btn-lg">Przywróć kopię</button></a><br>
+    {% endif %}
+</div>
+<p>
+    Tutaj kiedyś będzie można zmienić różne rzeczy (np. tło górnej belki)
+</p>
+{% endblock %}
