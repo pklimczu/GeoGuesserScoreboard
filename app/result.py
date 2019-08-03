@@ -130,3 +130,9 @@ def add_by_link():
         ghosts = ", ".join(ghost_users)
         flash("Poniżsi użytkownicy nie istnieją i nie zostają uwzględnieni w bazie danych wyników: {}".format(ghosts))
     return render_template('result/add_by_link.html')
+
+@bp.route('/summary')
+@login_required
+def summary():
+
+    return render_template('result/summary.html')

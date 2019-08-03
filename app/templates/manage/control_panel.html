@@ -24,10 +24,20 @@
     <form method="POST" enctype="multipart/form-data">
     <div class="row align-items-center mt-3 mb-3 border-bottom">
         <div class="col mb-3">
-            <a href="{{ url_for('manage.create_backup') }}" class="mr-5"><button type="submit" class="btn btn-outline-danger btn-lg">Przywróć kopię</button></a>
+            <a href="#" class="mr-5"><button type="submit" class="btn btn-outline-danger btn-lg">Przywróć kopię</button></a>
         </div>
         <div class="col mb-3">
             <input type="file" name="backup_file" required>
+        </div>
+    </div>
+    </form>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('manage.change_password') }}">
+    <div class="row align-items-center mt-3 mb-3 border-bottom">
+        <div class="col mb-3">
+            <a href="#" class="mr-5"><button type="submit" class="btn btn-outline-danger btn-lg">Zmień hasło</button></a>
+        </div>
+        <div class="col mb-3">
+            <input type="password" name="password" required>
         </div>
     </div>
     </form>

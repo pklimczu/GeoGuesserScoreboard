@@ -8,6 +8,8 @@ from app.db import get_db, init_db_command
 
 from app.auth import login_required, admin_required
 
+from werkzeug.security import generate_password_hash
+
 bp = Blueprint('manage', __name__, url_prefix='/manage')
 
 def generate_csv(title, database_output):
@@ -150,3 +152,19 @@ def create_backup():
         )
     else:
         return abort(404)
+
+@bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    if len(request.form['password']) < 7:
+        flash("Hasło mniejsze niż 7 znaków to popierdółka, nie hasło.")
+    else:
+        password = generate_password_hash(request.form['password'])
+        username = g.user['username']
+        db = get_db()
+        db.execute("UPDATE user SET password = '{}' WHERE username = '{}'".format(password, username))
+        db.commit()
+        pas_lenth = str(len(request.form['password']))
+        first_char = request.form['password'][0]
+        flash("Hasło zostało zmienione. Zaczyna się od {} i ma {} znaków.".format(first_char, pas_lenth))
+    return redirect(url_for('manage.control_panel'))
