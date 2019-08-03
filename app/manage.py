@@ -24,7 +24,7 @@ def generate_backup_file():
     users = db.execute("SELECT * FROM user")
     games = db.execute("SELECT * FROM game")
     results = db.execute("SELECT * FROM result")
-    csv = "test,test\ntest,test"
+
     backup_file = generate_csv("user", users)
     backup_file += generate_csv("game", games)
     backup_file += generate_csv("result", results)
@@ -83,10 +83,24 @@ def remove_user(username):
 @bp.route('/dump_database')
 @admin_required
 def dump_database():
+    class Dumped:
+        pass
+
     db = get_db()
-    games = db.execute('SELECT * FROM game').fetchall()
-    results = db.execute('SELECT * FROM result').fetchall()
-    return render_template('manage/dump_database.html', games=games, results=results)
+    table_names = db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").fetchall()
+    dumped_data = []
+
+    for table in table_names:
+        dumped_table = Dumped()
+        dumped_table.name = table['name']
+        cursor = db.execute('SELECT * FROM "{}"'.format(dumped_table.name))
+        dumped_table.values = cursor.fetchall()
+        dumped_table.headers = [tuple[0] for tuple in cursor.description]
+        dumped_data.append(dumped_table)
+    
+    # games = db.execute('SELECT * FROM game').fetchall()
+    # results = db.execute('SELECT * FROM result').fetchall()
+    return render_template('manage/dump_database.html', dumped_data=dumped_data)
 
 @bp.route('/remove_entry/<database>:<id>')
 @admin_required
@@ -115,8 +129,10 @@ def control_panel():
 @admin_required
 def reset_db():
     if g.user['username'] == 'admin':
-        print("DUPA")
-        init_db_command()
+        db = get_db()
+        db.execute("DELETE FROM result WHERE id > 0")
+        db.execute("DELETE FROM game WHERE id > 0")
+        db.commit()
         flash("Baza danych została zresetowana")
         return redirect(url_for('manage.control_panel'))
     else:
