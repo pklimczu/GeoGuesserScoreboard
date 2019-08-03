@@ -28,6 +28,8 @@ CREATE TABLE result (
 
 CREATE TABLE link (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    link TEXT NOT NULL,
-    game_hash TEXT NOT NULL
+    game_id INTEGER NOT NULL,
+    map_hash TEXT NOT NULL,
+    game_hash TEXT NOT NULL,
+    FOREIGN KEY (game_id) REFERENCES game (id)
 );

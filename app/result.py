@@ -46,6 +46,7 @@ def link_parser(link):
     start = content.find(query_string) + len(query_string)
     end = content[start:].find(";\\n")
     parsed = json.loads(content[start:start+end])
+    map_id = parsed['mapSlug']
     keyword = 'hiScores'
     results = parsed[keyword]
     return_list = []
@@ -54,7 +55,10 @@ def link_parser(link):
         user = entry['playerName']
         score = entry['totalScore']
         return_list.append((user, score))
-    return (winner, return_list)
+    return (winner, return_list, map_id)
+
+def get_game_hash(link):
+    return link.split("/")[-1]
 
 def check_if_user_exists(username):
     db = get_db()
@@ -105,12 +109,11 @@ def add_by_link():
     ghost_users = []
     if request.method == 'POST':
         db = get_db()
-        played_map = request.form['map']
         link_to_results = request.form['link']
-        winner, results = link_parser(link_to_results)
+        winner, results, map_id = link_parser(link_to_results)
         cur = db.execute(
             'INSERT INTO game (map, winner) VALUES (?, ?)',
-             (played_map, winner[0])
+             (map_id, winner[0])
         )
         for result in results:
             if (check_if_user_exists(result[0])):
@@ -120,6 +123,8 @@ def add_by_link():
                 )
             else:
                 ghost_users.append(result[0])
+        game_hash = get_game_hash(link_to_results)
+        db.execute("INSERT INTO link (game_id, map_hash, game_hash) VALUES ('{}','{}','{}')".format(cur.lastrowid, map_id, game_hash))
         db.commit()
     if len(ghost_users) > 0:
         ghosts = ", ".join(ghost_users)

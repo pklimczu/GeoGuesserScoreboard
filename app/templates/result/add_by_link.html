@@ -7,18 +7,11 @@
 {% block content %}
 <form method="post">
 <div class="form-group row">
-    <label for='map' class="col-sm-2 col-form-label"><b>Link do mapy:</b></label>
+    <label for='link' class="col-sm-2 col-form-label"><b>Link do wyników:</b></label>
     <div class="col-sm-3">
-        <input class="form-control" name='map' id='map'>
+        <input class="form-control" name='link' id='link'>
     </div>
 </div>
-<hr>
-<div class="form-group row">
-        <label for='link' class="col-sm-2 col-form-label"><b>Link do wyników:</b></label>
-        <div class="col-sm-3">
-            <input class="form-control" name='link' id='link'>
-        </div>
-    </div>
 <input type='submit' class="btn btn-dark" value='Dodaj'>
 </form>
 {% endblock %}
