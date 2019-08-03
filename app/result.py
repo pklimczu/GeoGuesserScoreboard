@@ -1,10 +1,12 @@
 import functools, requests, json
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
 )
 
 from app.db import get_db
+
+from app.auth import login_required
 
 bp = Blueprint('result', __name__, url_prefix='/result')
 
@@ -61,6 +63,7 @@ def check_if_user_exists(username):
     return result
 
 @bp.route('/add')
+@login_required
 def add():
     return render_template('result/add.html')
 
@@ -76,6 +79,7 @@ def all_results():
     return render_template('result/all_results.html', current_month=current_month, last_month=last_month, all_time=all_time)
 
 @bp.route('/add_manually', methods=('GET', 'POST'))
+@login_required
 def add_manually():
     db = get_db()
     if request.method == 'POST':
@@ -96,6 +100,7 @@ def add_manually():
     return render_template('result/add_manually.html', users=users)
 
 @bp.route('/add_by_link', methods=('GET', 'POST'))
+@login_required
 def add_by_link():
     ghost_users = []
     if request.method == 'POST':

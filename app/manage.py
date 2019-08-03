@@ -6,6 +6,8 @@ from flask import (
 
 from app.db import get_db, init_db_command
 
+from app.auth import login_required, admin_required
+
 bp = Blueprint('manage', __name__, url_prefix='/manage')
 
 def generate_csv(title, database_output):
@@ -61,12 +63,14 @@ def recreate_from_backup(backup_file):
                 function(line)
 
 @bp.route('/users')
+@admin_required
 def users():
     db = get_db()
     users = db.execute('SELECT * FROM user').fetchall()
     return render_template('manage/users.html', users=users)
 
 @bp.route('/remove_user/<username>')
+@admin_required
 def remove_user(username):
     db = get_db()
     username = escape(username)
@@ -77,6 +81,7 @@ def remove_user(username):
     return redirect(url_for('manage.users'))
 
 @bp.route('/dump_database')
+@admin_required
 def dump_database():
     db = get_db()
     games = db.execute('SELECT * FROM game').fetchall()
@@ -84,6 +89,7 @@ def dump_database():
     return render_template('manage/dump_database.html', games=games, results=results)
 
 @bp.route('/remove_entry/<database>:<id>')
+@admin_required
 def remove_entry(database, id):
     database = escape(database)
     id = escape(id)
@@ -96,7 +102,7 @@ def remove_entry(database, id):
 
 @bp.route('/control_panel', methods=['GET', 'POST'])
 def control_panel():
-    if request.method == 'POST':
+    if request.method == 'POST' and g.user['username'] == 'admin':
         if 'backup_file' in request.files:
             backup_text = request.files['backup_file'].read().decode('utf-8')
             recreate_from_backup(backup_text)
@@ -106,6 +112,7 @@ def control_panel():
     return render_template('manage/control_panel.html')
 
 @bp.route('/reset_db')
+@admin_required
 def reset_db():
     if g.user['username'] == 'admin':
         print("DUPA")
@@ -116,6 +123,7 @@ def reset_db():
         return abort(404)
 
 @bp.route('/create_backup')
+@admin_required
 def create_backup():
     if g.user['username'] == 'admin':
         backup_file = generate_backup_file()

@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
 )
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -89,4 +89,13 @@ def login_required(view):
         if g.user is None:
             return redirect(url_for('auth.login'))
         return view(**kwargs)
+    return wrapped_view
+
+def admin_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user and g.user['username'] == 'admin':
+            return view(**kwargs)
+        else:   
+            return abort(404)
     return wrapped_view
