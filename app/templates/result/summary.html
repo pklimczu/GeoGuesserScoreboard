@@ -3,5 +3,28 @@
 {% block title %}Macierz wyników{% endblock %}
 
 {% block content %}
-<p>Tu będzie taka tabelka jak mieliśmy w Google Spreadsheet</p>
+<table class="table table-hover table-sm">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">data</th>
+            <th scope="col">mapa</th>
+        {% for player in players %}
+            <th scope="col">{{ player.name }}</th>
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for game_entry in games %}
+        <tr>
+            <th scope="row">{{ game_entry.date }}</th>
+            <th scope="row"><a href="{{ game_entry.map_url }}">link</a></th>
+        {% for score in game_entry.results %}
+            <th scope="row" {% if score.winner %}
+            style="background-color: #D7FCD4;"
+            {% endif %}>{{ score.value }}</th>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
