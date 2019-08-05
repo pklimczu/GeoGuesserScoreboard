@@ -28,6 +28,8 @@
     </tbody>
 </table>
 {% endblock %}
-{% block javascript %}
-  <script src="colFilter.js"></script>
-{% endblock javascript %}
+
+{% block scripts_bottom %}
+<!--To filter users without any score-->
+<script src="{{ url_for('static', filename='colFilter.js') }}"></script>
+{% endblock %}
