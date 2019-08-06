@@ -46,5 +46,11 @@
             {% block content %}{% endblock %}
         </section>
     </div>
-    {% block scripts_bottom %}{% endblock %}
+    {% block scripts_bottom %}
+	
+	{% endblock %}
+	{% block navbar_gb_color %}
+	<!--To handle color picker and navbar backgorund color-->
+	<script src="{{ url_for('static', filename='navbarBgColor.js') }}"></script>
+	{% endblock %}
 </body>
