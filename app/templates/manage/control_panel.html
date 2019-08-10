@@ -42,13 +42,13 @@
         </div>
     </div>
     </form>
-    <form>
+    <form method="POST" action="{{ url_for('user.change_bg_navbar') }}">
     <div class="row align-items-center mt-3 mb-3 border-bottom">
         <div class="col mb-3">
-            <a href="#" class="mr-5"><button id="navbar-bg-color-picker-btn" class="btn btn-outline-danger btn-lg">Zmień tło górnej belki</button></a>
+            <a href="#" class="mr-5"><button type="submit" class="btn btn-outline-danger btn-lg">Zmień tło górnej belki</button></a>
         </div>
         <div class="col mb-3">
-            <input id="navbar-bg-color-picker" class="jscolor" value="">
+            <input id="navbar-bg-color-picker" class="jscolor" name="bg_navbar_color" value="">
         </div>
     </div>
     </form>

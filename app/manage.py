@@ -26,10 +26,12 @@ def generate_backup_file():
     users = db.execute("SELECT * FROM user")
     games = db.execute("SELECT * FROM game")
     results = db.execute("SELECT * FROM result")
+    links = db.execute("SELECT * FROM link")
 
     backup_file = generate_csv("user", users)
     backup_file += generate_csv("game", games)
     backup_file += generate_csv("result", results)
+    backup_file += generate_csv("link", links)
     return backup_file
 
 def recreate_from_backup(backup_file):
@@ -55,7 +57,13 @@ def recreate_from_backup(backup_file):
         db.execute(formula)
         db.commit()
 
-    names =  {"user":restore_user, "game":restore_game, "result":restore_result}
+    def restore_link(link):
+        [id,game_id,map_hash,game_hash,*rest] = link.split(",")
+        formula = "INSERT INTO link (game_id,map_hash,game_hash) VALUES ({},{},{})".format(game_id,map_hash,game_hash)
+        db.execute(formula)
+        db.commit()
+
+    names =  {"user":restore_user, "game":restore_game, "result":restore_result, "link":restore_link}
     function = restore_user
     for line in backup_file.split("\n"):
         if line in names:

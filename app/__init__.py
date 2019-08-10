@@ -33,10 +33,11 @@ def create_app(test_config=None):
             flash(error)
         return render_template('index.html')
 
-    from . import db, auth, result, manage
+    from . import db, auth, result, manage, user
     db.init_app(app)
     app.register_blueprint(auth.bp)
     app.register_blueprint(result.bp)
     app.register_blueprint(manage.bp)
+    app.register_blueprint(user.bp)
 
     return app

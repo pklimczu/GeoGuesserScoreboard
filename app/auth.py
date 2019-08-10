@@ -70,7 +70,13 @@ def login():
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
+    
+    # Set navbar background color
+    navbar_bg = request.cookies.get('bg_navbar_color')
+    if navbar_bg is not None:
+        g.navbar_bg = "#" + navbar_bg
 
+    # Set user
     if user_id is None:
         g.user = None
     else:

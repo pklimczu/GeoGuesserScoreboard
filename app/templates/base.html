@@ -8,7 +8,7 @@
     {% block scripts %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: #E00024">
+    <nav class="navbar navbar-expand-sm navbar-dark" style="background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}">
         <a class="navbar-brand" href="{{ url_for('index') }}">GeoGuesser Scoreboard</a>
         <div class="navbar-collapse collapse w-100 order-3 dual-collapse2" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
