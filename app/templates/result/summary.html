@@ -17,7 +17,11 @@
     {% for game_entry in games %}
         <tr>
             <th scope="row">{{ game_entry.date }}</th>
+            {% if game_entry.map_url|length %}
             <th scope="row"><a href="{{ game_entry.map_url }}">link</a></th>
+            {% else %}
+            <th scope="row">¯\_(ツ)_/¯</th>
+            {% endif %}
         {% for score in game_entry.results %}
             <th scope="row" {% if score.winner %}
             style="background-color: #D7FCD4;"

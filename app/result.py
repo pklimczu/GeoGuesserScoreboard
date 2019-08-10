@@ -91,7 +91,10 @@ def check_if_user_exists(username):
     return result
 
 def get_url_to_map(url_hash):
-    return "https://geoguessr.com/maps/" + url_hash
+    if len(url_hash) > 0:
+        return "https://geoguessr.com/maps/" + url_hash
+    else:
+        return ""
 
 @bp.route('/add')
 @login_required
@@ -117,7 +120,7 @@ def add_manually():
         played_map = request.form['map']
         winner, results = get_winner_and_results(request.form)
         game_uuid = str(uuid.uuid4())
-        cur = db.execute(
+        db.execute(
             'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
              (played_map, winner[0], game_uuid)
         )
@@ -140,7 +143,7 @@ def add_by_link():
         link_to_results = request.form['link']
         winner, results, map_id = link_parser(link_to_results)
         game_uuid = str(uuid.uuid4())
-        cur = db.execute(
+        db.execute(
             'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
              (map_id, winner[0], game_uuid)
         )
@@ -153,7 +156,7 @@ def add_by_link():
             else:
                 ghost_users.append(result.username)
         game_hash = get_game_hash(link_to_results)
-        db.execute("INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(cur.lastrowid, map_id, game_hash))
+        db.execute("INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(game_uuid, map_id, game_hash))
         db.commit()
     if len(ghost_users) > 0:
         ghosts = ", ".join(ghost_users)
@@ -187,7 +190,7 @@ def summary():
             players.append(player)
 
     # Get list of all games
-    games_db = db.execute('SELECT * FROM game').fetchall()
+    games_db = db.execute('SELECT * FROM game ORDER BY datestamp DESC').fetchall()
     # For every game
     for game in games_db:
         # Create an instance of GameEntry
