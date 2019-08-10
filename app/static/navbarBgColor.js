@@ -12,6 +12,7 @@ function rgb2hex(rgb) {
 
 function currentNavbarBgColorFromStorage()
 {
+  console.log("DUPA")
   if (navBgColorStorage != undefined)
   {
     //document.querySelector('body').style.backgroundColor = "#" + navBgColorStorage; // body for testing
@@ -57,5 +58,5 @@ const navbarBgColorPickerBtn = document.querySelector('#navbar-bg-color-picker-b
 const navbarBgColorPicker = document.querySelector('#navbar-bg-color-picker');
 let navBgColorStorage = localStorage.getItem('navBgColor');
 
-currentNavbarBgColorFromStorage();
+// currentNavbarBgColorFromStorage();
 addNavbarBgColorEventListener();
