@@ -48,6 +48,7 @@
             <th scope="col">#</th>
             <th scope="col">użytkownik</th>
             <th scope="col">liczba zwycięstw</th>
+            <th scope="col">liczba gier</th>
         </tr>
     </thead>
     <tbody>
@@ -56,6 +57,7 @@
             <th scope="row">{{ loop.index }}</th>
             <td>{{ entry[0] }}</td>
             <td>{{ entry[1] }}</td>
+            <td>{{ entry[2] }}</td>
         </tr>
     {% endfor %}
     </tbody>

@@ -45,6 +45,15 @@ def get_sorted_results(formula):
     sorted_results.reverse()
     return sorted_results
 
+def get_all_games_counted(sorted_results):
+    new_structure = []
+    db = get_db()
+    for entry in sorted_results:
+        user_uuid = db.execute("SELECT * FROM user WHERE username = '{}'".format(entry[0])).fetchone()['uuid']
+        played_games = db.execute("SELECT COUNT(*) FROM result WHERE user_uuid = '{}'".format(user_uuid)).fetchone()
+        new_structure.append([*entry, played_games[0]])
+    return new_structure
+
 def get_winner_and_results(request_form):
     db = get_db()
     winner = ["",0]
@@ -109,7 +118,8 @@ def all_results():
 
     current_month = get_sorted_results(current_month_formula)
     last_month = get_sorted_results(last_month_formula)
-    all_time = get_sorted_results(all_time_formula)
+    all_time = get_all_games_counted(get_sorted_results(all_time_formula))
+    print(all_time)
     return render_template('result/all_results.html', current_month=current_month, last_month=last_month, all_time=all_time)
 
 @bp.route('/add_manually', methods=('GET', 'POST'))
