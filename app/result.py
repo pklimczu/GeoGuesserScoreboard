@@ -1,4 +1,4 @@
-import functools, requests, json
+import functools, requests, json, uuid
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
@@ -14,15 +14,14 @@ class UserResultPair:
     """ Pair representing tuple of user and its result """
     def __init__(self):
         self.username = ""
-        self.user_id = 0
+        self.user_uuid = 0
         self.score = 0
 
-    def get_id_from_name(self):
+    def get_uuid_from_name(self):
         db = get_db()
         user = db.execute("SELECT * FROM user WHERE username = '{}'".format(self.username)).fetchone()
         if user:
-            print("user_id", user['id'])
-            self.user_id = user['id']
+            self.user_uuid = user['uuid']
 
 class GameEntry:
     """" Entry for any played game """
@@ -53,11 +52,11 @@ def get_winner_and_results(request_form):
     for entry in list(request_form)[1:]:
         if (str(request_form[entry]).isdigit()):
             user_result_pair = UserResultPair()
-            user_result_pair.user_id = str(entry.split("_")[-1])
+            user_result_pair.user_uuid = str(entry.split("_")[-1])
             user_result_pair.score = int(request_form[entry])
             results.append(user_result_pair)
             if winner[1] < user_result_pair.score:
-                command = "SELECT id, username FROM user WHERE id = {}".format(user_result_pair.user_id)
+                command = "SELECT * FROM user WHERE uuid = {}".format(user_result_pair.user_uuid)
                 user = db.execute(command).fetchone()
                 username = user['username']
                 winner = [username, user_result_pair.score]
@@ -78,7 +77,7 @@ def link_parser(link):
         user_result_pair = UserResultPair()
         user_result_pair.username = entry['playerName']
         user_result_pair.score = entry['totalScore']
-        user_result_pair.get_id_from_name()
+        user_result_pair.get_uuid_from_name()
         return_list.append(user_result_pair)
     return (winner, return_list, map_id)
 
@@ -117,14 +116,15 @@ def add_manually():
     if request.method == 'POST':
         played_map = request.form['map']
         winner, results = get_winner_and_results(request.form)
+        game_uuid = str(uuid.uuid4())
         cur = db.execute(
-            'INSERT INTO game (map, winner) VALUES (?, ?)',
-             (played_map, winner[0])
+            'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
+             (played_map, winner[0], game_uuid)
         )
         for result in results:
             db.execute(
-                'INSERT INTO result (user_id, game_id, score) VALUES (?, ?, ?)',
-                (result.user_id, cur.lastrowid, result.score)
+                'INSERT INTO result (user_uuid, game_uuid, score) VALUES (?, ?, ?)',
+                (result.user_uuid, game_uuid, result.score)
             )
         db.commit()
 
@@ -139,20 +139,21 @@ def add_by_link():
         db = get_db()
         link_to_results = request.form['link']
         winner, results, map_id = link_parser(link_to_results)
+        game_uuid = str(uuid.uuid4())
         cur = db.execute(
-            'INSERT INTO game (map, winner) VALUES (?, ?)',
-             (map_id, winner[0])
+            'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
+             (map_id, winner[0], game_uuid)
         )
         for result in results:
             if (check_if_user_exists(result.username)):
                 db.execute(
-                    'INSERT INTO result (user_id, game_id, score) VALUES (?, ?, ?)',
-                    (result.user_id, cur.lastrowid, result.score)
+                    'INSERT INTO result (user_uuid, game_uuid, score) VALUES (?, ?, ?)',
+                    (result.user_uuid, game_uuid, result.score)
                 )
             else:
                 ghost_users.append(result.username)
         game_hash = get_game_hash(link_to_results)
-        db.execute("INSERT INTO link (game_id, map_hash, game_hash) VALUES ('{}','{}','{}')".format(cur.lastrowid, map_id, game_hash))
+        db.execute("INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(cur.lastrowid, map_id, game_hash))
         db.commit()
     if len(ghost_users) > 0:
         ghosts = ", ".join(ghost_users)
@@ -164,7 +165,7 @@ def add_by_link():
 def summary():
     class Player:
         def __init__(self):
-            self.id = ""
+            self.uuid = ""
             self.name = ""
 
     class Score:
@@ -181,7 +182,7 @@ def summary():
     for user in users_db:
         if (user['username'] != 'admin'):
             player = Player()
-            player.id = user['id']
+            player.uuid = user['uuid']
             player.name = user['username']
             players.append(player)
 
@@ -191,13 +192,13 @@ def summary():
     for game in games_db:
         # Create an instance of GameEntry
         game_entry = GameEntry()
-        game_id = game['id']
+        game_uuid = game['uuid']
         game_entry.date = game['datestamp']
         game_entry.map_url = get_url_to_map(game['map'])
         game_entry.winner = game['winner']
 
         for player in players:
-            formula = "SELECT * FROM result WHERE user_id = '{}' AND game_id = '{}'".format(player.id, game_id)
+            formula = "SELECT * FROM result WHERE user_uuid = '{}' AND game_uuid = '{}'".format(player.uuid, game_uuid)
             result = db.execute(formula).fetchone()
             score = Score()
             if result:

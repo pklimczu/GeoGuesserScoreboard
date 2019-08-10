@@ -19,9 +19,9 @@
 <hr>
 {% for user in users %}
 <div class="form-group row">
-    <label for='input_{{ user.id }}' class="col-sm-2 col-form-label">{{ user.username }}:</label>
+    <label for='input_{{ user.uuid }}' class="col-sm-2 col-form-label">{{ user.username }}:</label>
     <div class="col-sm-3">
-        <input class="form-control" name='input_{{ user.id }}' id='input_{{ user.id }}'>
+        <input class="form-control" name='input_{{ user.uuid }}' id='input_{{ user.uuid }}'>
     </div>
 </div>
 {% endfor %}

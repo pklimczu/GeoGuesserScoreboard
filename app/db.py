@@ -1,6 +1,6 @@
 import sqlite3
 
-import click
+import click, uuid
 from flask import current_app, g
 from flask.cli import with_appcontext
 from werkzeug.security import generate_password_hash
@@ -31,7 +31,8 @@ def create_admin():
     db = get_db()
     user = 'admin'
     password = generate_password_hash(current_app.config['ADM_PASS'])
-    formula = "INSERT INTO user (username, password) VALUES ('{}', '{}')".format(user, password)
+    user_uuid = str(uuid.uuid4())
+    formula = "INSERT INTO user (username, password, uuid) VALUES ('{}', '{}', '{}')".format(user, password, user_uuid)
     db.execute(formula)
     db.commit()
 

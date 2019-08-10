@@ -1,4 +1,4 @@
-import functools
+import functools, uuid
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
@@ -17,6 +17,7 @@ def register():
                 username = request.form['username']
                 password = request.form['password']
                 db = get_db()
+                user_uuid = str(uuid.uuid4())
                 error = None
 
                 if not username:
@@ -30,8 +31,8 @@ def register():
                 
                 if error is None:
                     db.execute(
-                        'INSERT INTO user (username, password) VALUES (?, ?)',
-                        (username, generate_password_hash(password))
+                        'INSERT INTO user (username, password, uuid) VALUES (?, ?, ?)',
+                        (username, generate_password_hash(password), user_uuid)
                     )
                     db.commit()
                     flash("Użytkownik {} dodany!".format(username))

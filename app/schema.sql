@@ -6,30 +6,32 @@ DROP TABLE IF EXISTS link;
 CREATE TABLE user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    uuid TEXT NOT NULL
 );
 
 CREATE TABLE game (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     datestamp DATE NOT NULL DEFAULT CURRENT_DATE,
     map TEXT,
-    winner INTEGER,
-    FOREIGN KEY (winner) REFERENCES user (id)
+    winner TEXT,
+    uuid TEXT NOT NULL,
+    FOREIGN KEY (winner) REFERENCES user (username)
 );
 
 CREATE TABLE result (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    game_id INTEGER NOT NULL,
+    user_uuid TEXT NOT NULL,
+    game_uuid TEXT NOT NULL,
     score INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user (id),
-    FOREIGN KEY (game_id) REFERENCES game (id)
+    FOREIGN KEY (user_uuid) REFERENCES user (uuid),
+    FOREIGN KEY (game_uuid) REFERENCES game (uuid)
 );
 
 CREATE TABLE link (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    game_id INTEGER NOT NULL,
+    game_uuid TEXT NOT NULL,
     map_hash TEXT NOT NULL,
     game_hash TEXT NOT NULL,
-    FOREIGN KEY (game_id) REFERENCES game (id)
+    FOREIGN KEY (game_uuid) REFERENCES game (uuid)
 );

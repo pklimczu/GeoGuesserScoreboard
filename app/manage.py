@@ -37,29 +37,29 @@ def generate_backup_file():
 def recreate_from_backup(backup_file):
     db = get_db()
     def restore_user(user):
-        [id,username,password,*rest] = user.split(",")
+        [id,username,password,uuid,*rest] = user.split(",")
         user_exists = db.execute("SELECT * FROM user WHERE username = '{}'".format(username)).fetchone()
         if not user_exists:
-            db.execute("INSERT INTO user (username, password) VALUES ('{}','{}')".format(username, password))
+            db.execute("INSERT INTO user (username, password, uuid) VALUES ('{}','{}', '{}')".format(username, password, uuid))
             db.commit()
         else:
             flash("{} istnieje!".format(username))
 
     def restore_game(game):
-        [id,datestamp,played_map,winner,*rest] = game.split(",")
-        formula = "INSERT INTO game (datestamp, map, winner) VALUES ('{}','{}','{}')".format(datestamp, played_map, winner)
+        [id,datestamp,played_map,winner,uuid,*rest] = game.split(",")
+        formula = "INSERT INTO game (datestamp, map, winner, uuid) VALUES ('{}','{}','{}','{}')".format(datestamp, played_map, winner, uuid)
         db.execute(formula)
         db.commit()
 
     def restore_result(result):
-        [id,user_id,game_id,score,*rest] = result.split(",")
-        formula = "INSERT INTO result (user_id, game_id, score) VALUES ({},{},{})".format(user_id, game_id, score)
+        [id,user_uuid,game_uuid,score,*rest] = result.split(",")
+        formula = "INSERT INTO result (user_uuid, game_uuid, score) VALUES ('{}','{}','{}')".format(user_uuid, game_uuid, score)
         db.execute(formula)
         db.commit()
 
     def restore_link(link):
-        [id,game_id,map_hash,game_hash,*rest] = link.split(",")
-        formula = "INSERT INTO link (game_id,map_hash,game_hash) VALUES ({},{},{})".format(game_id,map_hash,game_hash)
+        [id,game_uuid,map_hash,game_hash,*rest] = link.split(",")
+        formula = "INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(game_uuid, map_hash, game_hash)
         db.execute(formula)
         db.commit()
 
@@ -142,6 +142,8 @@ def reset_db():
         db = get_db()
         db.execute("DELETE FROM result WHERE id > 0")
         db.execute("DELETE FROM game WHERE id > 0")
+        db.execute("DELETE FROM link WHERE id > 0")
+        db.execute("DELETE FROM user WHERE id > 1")
         db.commit()
         flash("Baza danych została zresetowana")
         return redirect(url_for('manage.control_panel'))
