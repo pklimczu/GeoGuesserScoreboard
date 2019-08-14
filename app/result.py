@@ -6,7 +6,7 @@ from flask import (
 
 from app.db import get_db
 
-from app.auth import login_required
+from app.auth import login_required, admin_required
 
 bp = Blueprint('result', __name__, url_prefix='/result')
 
@@ -30,6 +30,7 @@ class GameEntry:
         self.map_url = ""
         self.results = []
         self.winner = ""
+        self.uuid = ""
 
 def get_sorted_results(formula):
     db = get_db()
@@ -205,13 +206,13 @@ def summary():
     for game in games_db:
         # Create an instance of GameEntry
         game_entry = GameEntry()
-        game_uuid = game['uuid']
+        game_entry.uuid = game['uuid']
         game_entry.date = game['datestamp']
         game_entry.map_url = get_url_to_map(game['map'])
         game_entry.winner = game['winner']
 
         for player in players:
-            formula = "SELECT * FROM result WHERE user_uuid = '{}' AND game_uuid = '{}'".format(player.uuid, game_uuid)
+            formula = "SELECT * FROM result WHERE user_uuid = '{}' AND game_uuid = '{}'".format(player.uuid, game_entry.uuid)
             result = db.execute(formula).fetchone()
             score = Score()
             if result:
@@ -224,3 +225,27 @@ def summary():
         games.append(game_entry)
 
     return render_template('result/summary.html', games=games, players=players)
+
+@bp.route("/update_game/<game_uuid>")
+@admin_required
+def update_game(game_uuid):
+    db = get_db()
+    game_hash = db.execute("SELECT * FROM link WHERE game_uuid = '{}'".format(game_uuid)).fetchone()
+    if game_hash:
+        link = "https://geoguessr.com/results/" + game_hash['game_hash']
+        winner, results, map_id = link_parser(link)
+
+        already_added_uuids = [x['user_uuid'] for x in db.execute("SELECT * FROM result WHERE game_uuid = '{}'".format(game_uuid)).fetchall()]
+        already_added_names = [db.execute("SELECT * FROM user WHERE uuid = '{}'".format(x)).fetchone()['username'] for x in already_added_uuids]
+        missing_results = list(set([x.username for x in results]) - set(already_added_names))
+        
+        if missing_results:
+            for result in results:
+                if result.username in missing_results:
+                    db.execute("INSERT INTO result (user_uuid, game_uuid, score) VALUES ('{}','{}','{}')".format(result.user_uuid, game_uuid, result.score))
+                    db.commit()
+            db.execute("UPDATE game SET winner = '{}' WHERE uuid = '{}'".format(winner[0], game_uuid))
+    else:
+        flash("Brak danych dla tej rozgrywki!")
+
+    return redirect(url_for("result.summary"))

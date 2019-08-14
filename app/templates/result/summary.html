@@ -11,6 +11,9 @@
         {% for player in players %}
             <th scope="col">{{ player.name }}</th>
         {% endfor %}
+        {% if g.user['username'] == 'admin' %}
+            <th scope="col">#</th>
+        {% endif %}
         </tr>
     </thead>
     <tbody>
@@ -27,6 +30,7 @@
             style="background-color: #D7FCD4;"
             {% endif %}>{{ score.value }}</th>
         {% endfor %}
+            <th scope="row"><a href="{{ url_for('result.update_game', game_uuid=game_entry.uuid) }}">&#x21bb;</a></th>
         </tr>
     {% endfor %}
     </tbody>
