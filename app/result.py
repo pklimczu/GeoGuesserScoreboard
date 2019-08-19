@@ -82,13 +82,17 @@ def link_parser(link):
     keyword = 'hiScores'
     results = parsed[keyword]
     return_list = []
-    winner = [results[0]['playerName'], results[0]['totalScore']]
+    winner = []
     for entry in results:
         user_result_pair = UserResultPair()
         user_result_pair.username = entry['playerName']
         user_result_pair.score = entry['totalScore']
         user_result_pair.get_uuid_from_name()
-        return_list.append(user_result_pair)
+        if user_result_pair.user_uuid:
+            return_list.append(user_result_pair)
+
+        if len(return_list):
+            winner = [return_list[0].username, return_list[0].score]
     return (winner, return_list, map_id)
 
 def get_game_hash(link):
@@ -153,22 +157,25 @@ def add_by_link():
         db = get_db()
         link_to_results = request.form['link']
         winner, results, map_id = link_parser(link_to_results)
-        game_uuid = str(uuid.uuid4())
-        db.execute(
-            'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
-             (map_id, winner[0], game_uuid)
-        )
-        for result in results:
-            if (check_if_user_exists(result.username)):
-                db.execute(
-                    'INSERT INTO result (user_uuid, game_uuid, score) VALUES (?, ?, ?)',
-                    (result.user_uuid, game_uuid, result.score)
-                )
-            else:
-                ghost_users.append(result.username)
-        game_hash = get_game_hash(link_to_results)
-        db.execute("INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(game_uuid, map_id, game_hash))
-        db.commit()
+        if winner:
+            game_uuid = str(uuid.uuid4())
+            db.execute(
+                'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
+                (map_id, winner[0], game_uuid)
+            )
+            for result in results:
+                if (check_if_user_exists(result.username)):
+                    db.execute(
+                        'INSERT INTO result (user_uuid, game_uuid, score) VALUES (?, ?, ?)',
+                        (result.user_uuid, game_uuid, result.score)
+                    )
+                else:
+                    ghost_users.append(result.username)
+            game_hash = get_game_hash(link_to_results)
+            db.execute("INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(game_uuid, map_id, game_hash))
+            db.commit()
+        else:
+            flash("Pod poniższym linkiem nie ma wyników zarejestrowanych użytkowników")
     if len(ghost_users) > 0:
         ghosts = ", ".join(ghost_users)
         flash("Poniżsi użytkownicy nie istnieją i nie zostają uwzględnieni w bazie danych wyników: {}".format(ghosts))
@@ -241,7 +248,7 @@ def update_game(game_uuid):
         
         if missing_results:
             for result in results:
-                if result.username in missing_results:
+                if result.username in missing_results and result.user_uuid:
                     db.execute("INSERT INTO result (user_uuid, game_uuid, score) VALUES ('{}','{}','{}')".format(result.user_uuid, game_uuid, result.score))
                     db.commit()
             db.execute("UPDATE game SET winner = '{}' WHERE uuid = '{}'".format(winner[0], game_uuid))
