@@ -1,4 +1,4 @@
-import functools, requests, json, uuid
+import functools, requests, yaml, uuid
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
@@ -77,7 +77,7 @@ def link_parser(link):
     query_string = "window.apiModel = "
     start = content.find(query_string) + len(query_string)
     end = content[start:].find(";\\n")
-    parsed = json.loads(content[start:start+end])
+    parsed = yaml.load(content[start:start+end])
     map_id = parsed['mapSlug']
     keyword = 'hiScores'
     results = parsed[keyword]
@@ -252,6 +252,7 @@ def update_game(game_uuid):
                     db.execute("INSERT INTO result (user_uuid, game_uuid, score) VALUES ('{}','{}','{}')".format(result.user_uuid, game_uuid, result.score))
                     db.commit()
             db.execute("UPDATE game SET winner = '{}' WHERE uuid = '{}'".format(winner[0], game_uuid))
+            db.commit()
     else:
         flash("Brak danych dla tej rozgrywki!")
 
