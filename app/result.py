@@ -28,9 +28,13 @@ class GameEntry:
     def __init__(self):
         self.date = ""
         self.map_url = ""
+        self.game_url = ""
         self.results = []
         self.winner = ""
         self.uuid = ""
+        self.first_place = 0
+        self.second_place = 0
+        self.third_place = 0
 
 def get_sorted_results(formula):
     db = get_db()
@@ -110,6 +114,12 @@ def get_url_to_map(url_hash):
     else:
         return ""
 
+def get_url_to_challenge(url_hash):
+    if len(url_hash) > 0:
+        return "https://geoguessr.com/challenge/" + url_hash
+    else:
+        return ""   
+
 @bp.route('/add')
 @login_required
 def add():
@@ -184,6 +194,9 @@ def add_by_link():
 @bp.route('/summary')
 @login_required
 def summary():
+    """
+    Former way of displaying results (as a matrix, switched off September 2019)
+    """
     class Player:
         def __init__(self):
             self.uuid = ""
@@ -232,6 +245,63 @@ def summary():
         games.append(game_entry)
 
     return render_template('result/summary.html', games=games, players=players)
+
+@bp.route("/winners")
+@login_required
+def winners():
+    class Player:
+        def __init__(self):
+            self.uuid = ""
+            self.name = ""
+            self.score = 0
+            self.lost = 0
+
+    def parse_result(result, best_score):
+        player = Player()
+        player.uuid = result['user_uuid']
+        player.name = uuid_players_dict[player.uuid]
+        player.score = result['score']
+        player.lost = result['score'] - best_score
+        return player
+
+    db = get_db()
+    results = []
+    uuid_players_dict = dict()
+
+    # Prepare the players uuid-username dict
+    users_db = db.execute('SELECT * FROM user').fetchall()
+    for user in users_db:
+        uuid_players_dict[user['uuid']] = user['username']
+
+    # Get list of all games
+    games_db = db.execute('SELECT * FROM game ORDER BY datestamp DESC').fetchall()
+    # For every game
+    for game in games_db:
+        # Create an instance of GameEntry
+        game_entry = GameEntry()
+        game_entry.uuid = game['uuid']
+        game_entry.date = game['datestamp']
+        game_entry.map_url = get_url_to_map(game['map'])
+
+        winners_select = "SELECT * FROM result WHERE game_uuid = '{}' ORDER BY score DESC LIMIT 3".format(game_entry.uuid)
+        best_results = db.execute(winners_select).fetchall()
+        best_score = best_results[0]['score']
+        if (len(best_results) > 0):
+            game_entry.first_place = parse_result(best_results[0], best_score)
+        if (len(best_results) > 1):
+            game_entry.second_place = parse_result(best_results[1], best_score)
+        if (len(best_results) > 2):
+            game_entry.third_place = parse_result(best_results[2], best_score)
+        
+        # Parsing link to challenge
+        game_hash_obj = db.execute("SELECT * FROM link WHERE game_uuid = '{}'".format(game_entry.uuid)).fetchone()
+        if game_hash_obj:
+            game_entry.game_url = get_url_to_challenge(game_hash_obj['game_hash'])
+        
+        results.append(game_entry)
+
+    return render_template('result/winners.html', results=results)    
+
 
 @bp.route("/update_game/<game_uuid>")
 @admin_required

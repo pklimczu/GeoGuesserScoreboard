@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Wyniki{% endblock %}
+
+{% block head %}
+<style>
+    .smaller {
+        font-size: 9pt;
+        font-stretch: expanded;
+    }
+
+    td.vertically {
+        vertical-align: middle;
+    }
+
+    .user {
+        font-weight: bold;
+    }
+
+    .score {
+        text-align: right;
+        vertical-align: top;
+        font-size: 9pt;
+        text-shadow: 0px 0px 1px black;
+    }
+
+    .red-font {
+        color: #aa0819;
+        text-shadow: 0px 0px 1px #aa0819;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<table class="table table-hover table-sm table-striped table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 10%;">data</th>
+            <th style="width: 23%;">zwycięzca</th>
+            <th style="width: 23%;">#2</th>
+            <th style="width: 23%;">#3</th>
+            <th style="width: 16%;">info</th>
+            <th style="width: 5%; text-align: center;" >&#x21bb;</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for game_entry in results %}
+        <tr>
+            <!--DATE-->
+            <td class="smaller vertically">{{ game_entry.date }}</td>
+            <!--FIRST PLACE-->
+            <td>
+                <span class="user">{{ game_entry.first_place.name }}</span><br/>
+                <span class="score">{{ game_entry.first_place.score }}</span>
+            </td>
+            <!--SECOND PLACE-->
+            <td>
+                <span class="user">{{ game_entry.second_place.name }}</span><br/>
+                <span class="score red-font">{{ game_entry.second_place.lost }}</span>
+            </td>
+            <!--THIRD PLACE-->
+            <td>
+                <span class="user">{{ game_entry.third_place.name }}</span><br/>
+                <span class="score red-font">{{ game_entry.third_place.lost }}</span>
+            </td>
+            <!--GAME INFO-->
+            <td class="smaller vertically">
+                {% if game_entry.map_url|length %}
+                <a href="{{ game_entry.map_url }}">link do mapy ({{ game_entry.map_url[-5:] }})</a><br/>
+                {% endif %}
+                {% if game_entry.game_url|length %}
+                <a href="{{ game_entry.game_url }}">challenge</a>
+                {% endif %}
+            </td>
+            <!--REFRESH-->
+            <td class="vertically" style="text-align: center;"><a href="{{ url_for('result.update_game', game_uuid=game_entry.uuid) }}">&#x21bb;</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts_bottom %}
+<!--To filter users without any score-->
+<script src="{{ url_for('static', filename='colFilter.js') }}"></script>
+{% endblock %}
