@@ -120,6 +120,11 @@ def get_url_to_challenge(url_hash):
     else:
         return ""   
 
+def get_month(number):
+    number = int(number)
+    months = {1:"stycznia", 2:"lutego", 3:"marca", 4:"kwietnia", 5:"maja", 6:"czerwca", 7:"lipca", 8:"sierpnia", 9:"września", 10:"października", 11:"listopada", 12:"grudnia"}
+    return months[number]
+
 @bp.route('/add')
 @login_required
 def add():
@@ -264,6 +269,10 @@ def winners():
         player.lost = result['score'] - best_score
         return player
 
+    def get_date(datestamp):
+        (year, month, day) = str(datestamp).split("-")
+        return (day, get_month(month) + " " + year)
+
     db = get_db()
     results = []
     uuid_players_dict = dict()
@@ -280,7 +289,7 @@ def winners():
         # Create an instance of GameEntry
         game_entry = GameEntry()
         game_entry.uuid = game['uuid']
-        game_entry.date = game['datestamp']
+        game_entry.date = get_date(game['datestamp'])
         game_entry.map_url = get_url_to_map(game['map'])
 
         winners_select = "SELECT * FROM result WHERE game_uuid = '{}' ORDER BY score DESC LIMIT 3".format(game_entry.uuid)

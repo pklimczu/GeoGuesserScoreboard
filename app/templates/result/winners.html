@@ -9,6 +9,10 @@
         font-stretch: expanded;
     }
 
+    .date-day {
+        text-shadow: 0px 0px 1px black;
+    }
+
     td.vertically {
         vertical-align: middle;
     }
@@ -28,18 +32,30 @@
         color: #aa0819;
         text-shadow: 0px 0px 1px #aa0819;
     }
+
+    .first-place {
+        background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}50;
+    }
+
+    .second-place {
+        background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}20;
+    }
+
+    .third-place {
+        background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}10;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<table class="table table-hover table-sm table-striped table-bordered">
+<table class="table table-hover table-sm table-striped">
     <thead class="thead-dark">
         <tr>
-            <th style="width: 10%;">data</th>
+            <th style="width: 9%;">data</th>
             <th style="width: 23%;">zwycięzca</th>
             <th style="width: 23%;">#2</th>
             <th style="width: 23%;">#3</th>
-            <th style="width: 16%;">info</th>
+            <th style="width: 17%;">info</th>
             <th style="width: 5%; text-align: center;" >&#x21bb;</th>
         </tr>
     </thead>
@@ -47,19 +63,22 @@
     {% for game_entry in results %}
         <tr>
             <!--DATE-->
-            <td class="smaller vertically">{{ game_entry.date }}</td>
+            <td class="vertically">
+                <span class="date-day">{{ game_entry.date[0] }}</span><br/>
+                <span class="smaller">{{ game_entry.date[1] }}</span>
+            </td>
             <!--FIRST PLACE-->
-            <td>
+            <td class="first-place">
                 <span class="user">{{ game_entry.first_place.name }}</span><br/>
                 <span class="score">{{ game_entry.first_place.score }}</span>
             </td>
             <!--SECOND PLACE-->
-            <td>
+            <td class="second-place">
                 <span class="user">{{ game_entry.second_place.name }}</span><br/>
                 <span class="score red-font">{{ game_entry.second_place.lost }}</span>
             </td>
             <!--THIRD PLACE-->
-            <td>
+            <td class="third-place">
                 <span class="user">{{ game_entry.third_place.name }}</span><br/>
                 <span class="score red-font">{{ game_entry.third_place.lost }}</span>
             </td>
