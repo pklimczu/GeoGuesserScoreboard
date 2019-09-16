@@ -335,4 +335,4 @@ def update_game(game_uuid):
     else:
         flash("Brak danych dla tej rozgrywki!")
 
-    return redirect(url_for("result.summary"))
+    return redirect(url_for("result.winners"))
