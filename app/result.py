@@ -80,7 +80,8 @@ def link_parser(link):
     content = str(requests.get(link).content)
     query_string = "window.apiModel = "
     start = content.find(query_string) + len(query_string)
-    end = content[start:].find(";\\n")
+    # below number stands for ;\r\n that python could not detect
+    end = content[start:].find("</script>") - 9
     parsed = yaml.load(content[start:start+end])
     map_id = parsed['mapSlug']
     keyword = 'hiScores'
