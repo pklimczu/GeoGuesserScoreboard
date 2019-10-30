@@ -77,11 +77,12 @@ def get_winner_and_results(request_form):
     return (winner, results)
 
 def link_parser(link):
-    content = str(requests.get(link).content)
+    content = requests.get(link).content
+    content = content.decode('utf-8')
     query_string = "window.apiModel = "
     start = content.find(query_string) + len(query_string)
-    # below number stands for ;\r\n that python could not detect
-    end = content[start:].find("</script>") - 9
+    end = content[start:].find("};") + 1
+
     parsed = yaml.load(content[start:start+end])
     map_id = parsed['mapSlug']
     keyword = 'hiScores'
