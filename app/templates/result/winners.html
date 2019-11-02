@@ -51,11 +51,11 @@
 <table class="table table-hover table-sm table-striped">
     <thead class="thead-dark">
         <tr>
-            <th style="width: 9%;">data</th>
+            <th style="width: 10%;">data</th>
             <th style="width: 23%;">zwycięzca</th>
             <th style="width: 23%;">#2</th>
             <th style="width: 23%;">#3</th>
-            <th style="width: 17%;">info</th>
+            <th style="width: 16%;">info</th>
             <th style="width: 5%; text-align: center;" >&#x21bb;</th>
         </tr>
     </thead>
@@ -82,14 +82,16 @@
                 <span class="user">{{ game_entry.third_place.name }}</span><br/>
                 <span class="score red-font">{{ game_entry.third_place.lost }}</span>
             </td>
+        </a>
             <!--GAME INFO-->
             <td class="smaller vertically">
                 {% if game_entry.map_url|length %}
                 <a href="{{ game_entry.map_url }}">link do mapy ({{ game_entry.map_url[-5:] }})</a><br/>
                 {% endif %}
                 {% if game_entry.game_url|length %}
-                <a href="{{ game_entry.game_url }}">challenge</a>
+                <a href="{{ game_entry.game_url }}">challenge</a>,
                 {% endif %}
+                <a href="{{ url_for('game.game_details', game_id=game_entry.id) }}">szczegóły</a>
             </td>
             <!--REFRESH-->
             <td class="vertically" style="text-align: center;"><a href="{{ url_for('result.update_game', game_uuid=game_entry.uuid) }}">&#x21bb;</a></td>

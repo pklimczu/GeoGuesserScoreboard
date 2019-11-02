@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Szczegóły gry ({{ date }}){% endblock %}
+
+{% block head %}
+<style>
+    .first-place td {
+        font-weight: bold;
+        background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}50;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<table class="table table-hover table-striped">
+
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 7%;"></th>
+            <th style="width: 31%;">gracz</th>
+            <th style="width: 31%;">liczba punktów</th>
+            <th style="width: 31%;">strata</th>
+        </tr>
+    </thead> 
+    <tbody>
+    {% for player in players %}
+        
+        <tr class="{% if loop.index == 1 %}first-place{% endif %}">
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ player.username }}
+            </td>
+            <td>
+                {{ player.score }}
+            </td>
+            <td>
+                {{ player.lost }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

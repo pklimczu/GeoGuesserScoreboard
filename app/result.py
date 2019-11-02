@@ -26,6 +26,7 @@ class UserResultPair:
 class GameEntry:
     """" Entry for any played game """
     def __init__(self):
+        self.id = 0
         self.date = ""
         self.map_url = ""
         self.game_url = ""
@@ -290,6 +291,7 @@ def winners():
     for game in games_db:
         # Create an instance of GameEntry
         game_entry = GameEntry()
+        game_entry.id = game['id']
         game_entry.uuid = game['uuid']
         game_entry.date = get_date(game['datestamp'])
         game_entry.map_url = get_url_to_map(game['map'])
