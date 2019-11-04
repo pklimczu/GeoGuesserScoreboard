@@ -8,6 +8,16 @@
         font-weight: bold;
         background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}50;
     }
+
+    td.numbers, th.numbers {
+        text-align: right;
+        padding-right: 5%;
+    }
+
+    td.numbers {
+        font-family: monospace;
+        font-size: 13pt;
+    }
 </style>
 {% endblock %}
 
@@ -18,8 +28,8 @@
         <tr>
             <th style="width: 7%;"></th>
             <th style="width: 31%;">gracz</th>
-            <th style="width: 31%;">liczba punktów</th>
-            <th style="width: 31%;">strata</th>
+            <th style="width: 31%;" class="numbers">liczba punktów</th>
+            <th style="width: 31%;" class="numbers">strata</th>
         </tr>
     </thead> 
     <tbody>
@@ -32,10 +42,10 @@
             <td>
                 {{ player.username }}
             </td>
-            <td>
+            <td class="numbers">
                 {{ player.score }}
             </td>
-            <td>
+            <td class="numbers">
                 {{ player.lost }}
             </td>
         </tr>

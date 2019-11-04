@@ -44,6 +44,19 @@
     .third-place {
         background-color: {% if g.navbar_bg is defined %}{{ g.navbar_bg }}{% else %}#E00024{% endif %}10;
     }
+
+    .no_players {
+        text-align: center;
+    }
+
+    td.no_players {
+        font-size: 10.5pt;
+        text-shadow: 0px 0px 1px rgb(65, 65, 65);  
+    }
+
+    .more-than-3 {
+        text-shadow: 0px 0px 2px #aa0819;        
+    }
 </style>
 {% endblock %}
 
@@ -52,9 +65,10 @@
     <thead class="thead-dark">
         <tr>
             <th style="width: 10%;">data</th>
-            <th style="width: 23%;">zwycięzca</th>
-            <th style="width: 23%;">#2</th>
-            <th style="width: 23%;">#3</th>
+            <th style="width: 21%;">zwycięzca</th>
+            <th style="width: 21%;">#2</th>
+            <th style="width: 21%;">#3</th>
+            <th style="width: 6%;" class="no_players">#&#9822;</th>
             <th style="width: 16%;">info</th>
             <th style="width: 5%; text-align: center;" >&#x21bb;</th>
         </tr>
@@ -82,7 +96,14 @@
                 <span class="user">{{ game_entry.third_place.name }}</span><br/>
                 <span class="score red-font">{{ game_entry.third_place.lost }}</span>
             </td>
-        </a>
+            <!--NUMBER OF PLAYERS-->
+            <td class="vertically no_players">
+                {% if game_entry.no_players > 3 %}
+                <span class="more-than-3">({{ game_entry.no_players }})</span>
+                {% else %}
+                ({{ game_entry.no_players }})
+                {% endif %}
+            </td>
             <!--GAME INFO-->
             <td class="smaller vertically">
                 {% if game_entry.map_url|length %}

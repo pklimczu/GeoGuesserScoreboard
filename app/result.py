@@ -36,6 +36,7 @@ class GameEntry:
         self.first_place = 0
         self.second_place = 0
         self.third_place = 0
+        self.no_players = 0
 
 def get_sorted_results(formula):
     db = get_db()
@@ -296,8 +297,11 @@ def winners():
         game_entry.date = get_date(game['datestamp'])
         game_entry.map_url = get_url_to_map(game['map'])
 
-        winners_select = "SELECT * FROM result WHERE game_uuid = '{}' ORDER BY score DESC LIMIT 3".format(game_entry.uuid)
-        best_results = db.execute(winners_select).fetchall()
+        players_in_game_formula = "SELECT * FROM result WHERE game_uuid = '{}' ORDER BY score DESC".format(game_entry.uuid)
+        players_in_game = db.execute(players_in_game_formula).fetchall()
+        game_entry.no_players = len(players_in_game)
+
+        best_results = players_in_game[:3]
         best_score = best_results[0]['score']
         if (len(best_results) > 0):
             game_entry.first_place = parse_result(best_results[0], best_score)
