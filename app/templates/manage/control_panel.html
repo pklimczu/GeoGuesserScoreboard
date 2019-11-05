@@ -5,7 +5,11 @@
 {% block content %}
 <div class="container">
     {% if g.user['username'] == 'admin' %}
-
+    <div class="row align-items-center mt-3 mb-3 border-bottom">
+        <div class="col mb-3">
+            <a href="{{ url_for('auth.register') }}" class="mr-5"><button type="submit" class="btn btn-outline-danger btn-lg" id="add-user">Dodaj użytkownika</button></a>
+        </div>
+    </div>
     {% endif %}
     <form method="POST" enctype="multipart/form-data" action="{{ url_for('manage.change_password') }}">
     <div class="row align-items-center mt-3 mb-3 border-bottom">

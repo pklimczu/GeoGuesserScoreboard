@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    p.info, p.data {
+        font-size: 15pt;
+        vertical-align: middle;
+        margin-bottom: 0;
+    }
+
+    p.data
+    {
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block title %}{{ username }}{% endblock %}
+
+{% block content %}
+<table class="table table-hover table-dark table-striped table-borderless">
+    <tbody>
+        {% for curiosity in curiosities %}
+        <tr>
+            <td>{{ curiosity.info }}</td>
+            <td style="text-align: right; padding-right: 10%;">{{ curiosity.data }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}}

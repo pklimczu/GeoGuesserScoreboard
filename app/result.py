@@ -294,7 +294,7 @@ def winners():
 
 
 @bp.route("/update_game/<game_uuid>")
-@admin_required
+@login_required
 def update_game(game_uuid):
     db = get_db()
     game_hash = db.execute("SELECT * FROM link WHERE game_uuid = '{}'".format(game_uuid)).fetchone()

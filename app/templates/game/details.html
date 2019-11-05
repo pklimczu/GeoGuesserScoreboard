@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}Szczegóły gry ({{ date }}){% endblock %}
-
 {% block head %}
 <style>
     .first-place td {
@@ -18,7 +16,28 @@
         font-family: monospace;
         font-size: 13pt;
     }
+
+    a {
+        color: inherit;
+    }
 </style>
+{% endblock %}
+
+{% block header %}
+<hr>
+<div class="container">
+    <div class="row">
+        <div style="width: 90%">
+            <h1>Szczegóły gry ({{ date }})</h1>
+        </div>
+        {% if g.user['username'] == 'admin' %}
+        <div style="width: 10%; text-align: right;">
+            <a href="{{ url_for('game.remove', game_id=game_id) }}">usuń</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+<hr>
 {% endblock %}
 
 {% block content %}
@@ -40,7 +59,7 @@
                 {{ loop.index }}
             </td>
             <td>
-                {{ player.username }}
+                <a href="{{ url_for('user.profile', username=player.username) }}">{{ player.username }}</a>
             </td>
             <td class="numbers">
                 {{ player.score }}

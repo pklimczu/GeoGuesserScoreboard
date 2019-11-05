@@ -28,9 +28,9 @@ def uuid_to_playername(uuid):
         username = user['username']
     return username
 
-@bp.route("/game_details/<game_id>")
+@bp.route("/details/<game_id>")
 @login_required
-def game_details(game_id):
+def details(game_id):
     db = get_db()
     formula = "SELECT * FROM game WHERE id = '{}'".format(game_id)
     game = db.execute(formula).fetchone()
@@ -45,4 +45,26 @@ def game_details(game_id):
         player.score = fetched_player['score']
         player.get_lost(max_score)
         players.append(player)
-    return render_template('game/game_details.html', players=players, date=date)  
+    return render_template('game/details.html', players=players, date=date, game_id=game_id)
+
+@bp.route("/remove/<game_id>")
+@admin_required
+def remove(game_id):
+    db = get_db()
+    
+    formula_game_uuid = "SELECT * FROM game WHERE id = '{}'".format(game_id)
+    game_uuid_response = db.execute(formula_game_uuid).fetchone()
+    game_uuid = game_uuid_response['uuid']
+
+    if game_uuid:
+        formula_remove_link = "DELETE FROM link WHERE game_uuid = '{}'".format(game_uuid)
+        db.execute(formula_remove_link)
+        formula_remove_results = "DELETE FROM result WHERE game_uuid = '{}'".format(game_uuid)
+        db.execute(formula_remove_results)
+        formula_remove_game = "DELETE FROM game WHERE uuid = '{}'".format(game_uuid)
+        db.execute(formula_remove_game)
+        flash("Wynik usunięty")
+    else:
+        flash("Coś poszło nie tak :/")
+
+    return redirect(url_for("result.winners"))

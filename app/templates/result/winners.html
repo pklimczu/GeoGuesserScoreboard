@@ -112,7 +112,7 @@
                 {% if game_entry.game_url|length %}
                 <a href="{{ game_entry.game_url }}">challenge</a>,
                 {% endif %}
-                <a href="{{ url_for('game.game_details', game_id=game_entry.id) }}">szczegóły</a>
+                <a href="{{ url_for('game.details', game_id=game_entry.id) }}">szczegóły</a>
             </td>
             <!--REFRESH-->
             <td class="vertically" style="text-align: center;"><a href="{{ url_for('result.update_game', game_uuid=game_entry.uuid) }}">&#x21bb;</a></td>
