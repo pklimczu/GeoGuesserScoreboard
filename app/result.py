@@ -129,11 +129,6 @@ def get_month(number):
     months = {1:"stycznia", 2:"lutego", 3:"marca", 4:"kwietnia", 5:"maja", 6:"czerwca", 7:"lipca", 8:"sierpnia", 9:"września", 10:"października", 11:"listopada", 12:"grudnia"}
     return months[number]
 
-@bp.route('/add')
-@login_required
-def add():
-    return render_template('result/add.html')
-
 @bp.route('/all_results')
 def all_results():
     current_month_formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month') AND date('now', 'start of month', '+1 month', '-1 day');"
@@ -145,28 +140,6 @@ def all_results():
     all_time = get_all_games_counted(get_sorted_results(all_time_formula))
     print(all_time)
     return render_template('result/all_results.html', current_month=current_month, last_month=last_month, all_time=all_time)
-
-@bp.route('/add_manually', methods=('GET', 'POST'))
-@login_required
-def add_manually():
-    db = get_db()
-    if request.method == 'POST':
-        played_map = request.form['map']
-        winner, results = get_winner_and_results(request.form)
-        game_uuid = str(uuid.uuid4())
-        db.execute(
-            'INSERT INTO game (map, winner, uuid) VALUES (?, ?, ?)',
-             (played_map, winner[0], game_uuid)
-        )
-        for result in results:
-            db.execute(
-                'INSERT INTO result (user_uuid, game_uuid, score) VALUES (?, ?, ?)',
-                (result.user_uuid, game_uuid, result.score)
-            )
-        db.commit()
-
-    users = db.execute('SELECT * FROM user').fetchall()
-    return render_template('result/add_manually.html', users=users)
 
 @bp.route('/add_by_link', methods=('GET', 'POST'))
 @login_required

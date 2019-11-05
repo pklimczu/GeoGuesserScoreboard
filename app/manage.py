@@ -12,66 +12,6 @@ from werkzeug.security import generate_password_hash
 
 bp = Blueprint('manage', __name__, url_prefix='/manage')
 
-def generate_csv(title, database_output):
-    text = title + "\n"
-    for entry in database_output:
-        for field in entry:
-            text += str(field)
-            text += ","
-        text += "\n"
-    return text
-
-def generate_backup_file():
-    db = get_db()
-    users = db.execute("SELECT * FROM user")
-    games = db.execute("SELECT * FROM game")
-    results = db.execute("SELECT * FROM result")
-    links = db.execute("SELECT * FROM link")
-
-    backup_file = generate_csv("user", users)
-    backup_file += generate_csv("game", games)
-    backup_file += generate_csv("result", results)
-    backup_file += generate_csv("link", links)
-    return backup_file
-
-def recreate_from_backup(backup_file):
-    db = get_db()
-    def restore_user(user):
-        [id,username,password,uuid,*rest] = user.split(",")
-        user_exists = db.execute("SELECT * FROM user WHERE username = '{}'".format(username)).fetchone()
-        if not user_exists:
-            db.execute("INSERT INTO user (username, password, uuid) VALUES ('{}','{}', '{}')".format(username, password, uuid))
-            db.commit()
-        else:
-            flash("{} istnieje!".format(username))
-
-    def restore_game(game):
-        [id,datestamp,played_map,winner,uuid,*rest] = game.split(",")
-        formula = "INSERT INTO game (datestamp, map, winner, uuid) VALUES ('{}','{}','{}','{}')".format(datestamp, played_map, winner, uuid)
-        db.execute(formula)
-        db.commit()
-
-    def restore_result(result):
-        [id,user_uuid,game_uuid,score,*rest] = result.split(",")
-        formula = "INSERT INTO result (user_uuid, game_uuid, score) VALUES ('{}','{}','{}')".format(user_uuid, game_uuid, score)
-        db.execute(formula)
-        db.commit()
-
-    def restore_link(link):
-        [id,game_uuid,map_hash,game_hash,*rest] = link.split(",")
-        formula = "INSERT INTO link (game_uuid, map_hash, game_hash) VALUES ('{}','{}','{}')".format(game_uuid, map_hash, game_hash)
-        db.execute(formula)
-        db.commit()
-
-    names =  {"user":restore_user, "game":restore_game, "result":restore_result, "link":restore_link}
-    function = restore_user
-    for line in backup_file.split("\n"):
-        if line in names:
-            function = names[line]
-        else:
-            if (len(line) > 0):
-                function(line)
-
 @bp.route('/users')
 @admin_required
 def users():
