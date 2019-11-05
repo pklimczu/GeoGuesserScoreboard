@@ -44,8 +44,8 @@ def profile(username):
 
         # date of last game
         formula_game = "SELECT * FROM result WHERE user_uuid = '{}'".format(user_uuid)
-        reply_game = db.execute(formula_game).fetchone()
-        game_uuid = reply_game['game_uuid']
+        reply_game = db.execute(formula_game).fetchall()
+        game_uuid = reply_game[-1]['game_uuid']
         formula_date = "SELECT * FROM game WHERE uuid = '{}'".format(game_uuid)
         reply_date = db.execute(formula_date).fetchone()
         date = reply_date['datestamp']

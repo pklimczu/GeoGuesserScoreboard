@@ -63,6 +63,7 @@ def remove(game_id):
         db.execute(formula_remove_results)
         formula_remove_game = "DELETE FROM game WHERE uuid = '{}'".format(game_uuid)
         db.execute(formula_remove_game)
+        db.commit()
         flash("Wynik usunięty")
     else:
         flash("Coś poszło nie tak :/")
