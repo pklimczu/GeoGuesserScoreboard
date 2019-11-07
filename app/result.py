@@ -23,6 +23,13 @@ class UserResultPair:
         if user:
             self.user_uuid = user['uuid']
 
+def get_name_from_uuid(uuid):
+    db = get_db()
+    user = db.execute("SELECT * FROM user WHERE uuid = '{}'".format(uuid)).fetchone()
+    if user:
+        return user['username']
+    return "unknown"
+
 class GameEntry:
     """" Entry for any played game """
     def __init__(self):
@@ -43,7 +50,7 @@ def get_sorted_results(formula):
     output = db.execute(formula)
     results = dict()
     for entry in output:
-        winner = entry['winner']
+        winner = get_name_from_uuid(entry['winner'])
         if winner in results:
             results[winner] += 1
         else:
@@ -53,6 +60,7 @@ def get_sorted_results(formula):
     return sorted_results
 
 def get_all_games_counted(sorted_results):
+    print(sorted_results)
     new_structure = []
     db = get_db()
     for entry in sorted_results:
@@ -100,7 +108,7 @@ def link_parser(link):
             return_list.append(user_result_pair)
 
         if len(return_list):
-            winner = [return_list[0].username, return_list[0].score]
+            winner = [return_list[0].user_uuid, return_list[0].score]
     return (winner, return_list, map_id)
 
 def get_game_hash(link):
@@ -138,7 +146,7 @@ def all_results():
     current_month = get_sorted_results(current_month_formula)
     last_month = get_sorted_results(last_month_formula)
     all_time = get_all_games_counted(get_sorted_results(all_time_formula))
-    print(all_time)
+
     return render_template('result/all_results.html', current_month=current_month, last_month=last_month, all_time=all_time)
 
 @bp.route('/add_by_link', methods=('GET', 'POST'))

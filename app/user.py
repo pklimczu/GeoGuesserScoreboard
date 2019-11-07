@@ -40,7 +40,12 @@ def profile(username):
         user_uuid = user_uuid_reply['uuid']
 
         # date of the recent won
-        curiosities.append(Curiosity("Data ostatniego zwycięstwa", "TBD"))
+        last_won_formula = "SELECT * FROM game WHERE winner = '{}'".format(user_uuid)
+        last_won_reply = db.execute(last_won_formula).fetchone()
+        last_won = "wkrótce"
+        if last_won_reply:
+            last_won = last_won_reply['datestamp']
+        curiosities.append(Curiosity("Data ostatniego zwycięstwa", str(last_won)))
 
         # date of last game
         formula_game = "SELECT * FROM result WHERE user_uuid = '{}'".format(user_uuid)
