@@ -7,4 +7,5 @@ title = "Backup {}".format(today)
 
 path = os.getcwd() + "/../../instance/"
 gs = GmailService()
-gs.send_mail_with_attachment("quczmil@gmail.com",title,"Geoguesser Scoreboard",path,"app.sqlite")
+recipent_mail = ""
+gs.send_mail_with_attachment(recipent_mail, title, "Geoguesser Scoreboard", path, "app.sqlite")
