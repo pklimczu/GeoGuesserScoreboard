@@ -1,4 +1,4 @@
-import functools, requests, yaml, uuid
+import datetime, functools, requests, yaml, uuid
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
@@ -139,15 +139,41 @@ def get_month(number):
 
 @bp.route('/all_results')
 def all_results():
+    class MonthResultPair:
+        def __init__(self):
+            self.month_ago = 0
+            self.data_results = []
+
+        def get_header(self):
+            months = {1:"styczeń", 2:"luty", 3:"marzec", 4:"kwiecień", 5:"maj", 6:"czerwiec", 7:"lipiec", 8:"sierpień", 9:"wrzesień", 10:"październik", 11:"listopad", 12:"grudzień"}
+            difference = datetime.date.today() - datetime.timedelta(30*self.month_ago)
+            month = str(months[difference.month])
+            year = str(difference.year)
+            self.header = "Ranking " + month + " " + year 
+
     current_month_formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month') AND date('now', 'start of month', '+1 month', '-1 day');"
-    last_month_formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month', '-1 month') AND date('now', 'start of month', '-1 day');"
     all_time_formula = "SELECT * FROM game"
 
     current_month = get_sorted_results(current_month_formula)
-    last_month = get_sorted_results(last_month_formula)
     all_time = get_all_games_counted(get_sorted_results(all_time_formula))
 
-    return render_template('result/all_results.html', current_month=current_month, last_month=last_month, all_time=all_time)
+    db = get_db()
+    formula = "SELECT * FROM game ORDER BY datestamp"
+    handler = db.execute(formula).fetchall()[0]
+    first_game = handler['datestamp']
+    today_date = datetime.date.today()
+    months = (today_date.year - first_game.year) * 12 + today_date.month - first_game.month
+
+    results = []
+    for i in range(1, months + 1):
+        formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month', '-{} month') AND date('now', 'start of month', '-{} month', '-1 day');".format(i, i-1)
+        result = MonthResultPair()
+        result.month_ago = i
+        result.data_results = get_sorted_results(formula)
+        result.get_header()
+        results.append(result)
+
+    return render_template('result/all_results.html', current_month=current_month, all_time=all_time, results=results)
 
 @bp.route('/add_by_link', methods=('GET', 'POST'))
 @login_required
