@@ -17,10 +17,25 @@
     a.nav-item {
         font-size: 13pt;
     }
+
+    .score {
+        text-align: right;
+        vertical-align: top;
+    }
+
+    td.numbers, th.numbers {
+        text-align: right;
+        padding-right: 15%;
+        font-size: 13pt;
+    }
+
+    td.numbers {
+        font-family: 'Courier New', Courier, monospace;
+    }
 </style>
 {% endblock %}
 
-{% block title %}Wyniki według liczby zwycięstw{% endblock %}
+{% block title %}Wyniki według liczby punktów{% endblock %}
 
 {% block content %}
 <nav>
@@ -32,44 +47,44 @@
 </nav>
 <div class="tab-content" id="nav-tabContent">
     <br>
+    <!--CURRENT MONTH-->
     <div class="tab-pane fade show active" id="current-month" role="tabpanel" aria-labelledby="current-month-tab">
         <table class="table table-hover table-sm shadow p-3 mb-5 bg-white rounded">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">użytkownik</th>
-                    <th scope="col">liczba zwycięstw</th>
+                    <th scope="col" class="score numbers">liczba punktów</th>
                 </tr>
             </thead>
             <tbody>
             {% for entry in current_month %}
                 <tr {% if loop.first %}class="first-place"{% endif %}>
                     <th scope="row">{{ loop.index }}</th>
-                    <td><a href="{{ url_for('user.profile', username=entry[0]) }}">{{ entry[0] }}</a></td>
-                    <td>{{ entry[1] }}</td>
+                    <td><a href="{{ url_for('user.profile', username=entry.username) }}">{{ entry.username }}</a></td>
+                    <td class="score numbers">{{ entry.formatted_score }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         <hr>
     </div>
-    <div class="tab-pane fade" id="general" role="tabpanel" aria-labelledby="general-tab">
+    <!--GENERAL-->
+    <div class="tab-pane fade " id="general" role="tabpanel" aria-labelledby="general-tab">
         <table class="table table-hover table-sm shadow p-3 mb-5 bg-white rounded">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">użytkownik</th>
-                    <th scope="col">liczba zwycięstw</th>
-                    <th scope="col">liczba gier</th>
+                    <th scope="col" class="score numbers">liczba punktów</th>
                 </tr>
             </thead>
             <tbody>
-            {% for entry in all_time %}
+            {% for entry in total_results %}
                 <tr {% if loop.first %}class="first-place"{% endif %}>
                     <th scope="row">{{ loop.index }}</th>
-                    <td><a href="{{ url_for('user.profile', username=entry[0]) }}">{{ entry[0] }}</a></td>
-                    <td>{{ entry[1] }}</td>
-                    <td>{{ entry[2] }}</td>
+                    <td><a href="{{ url_for('user.profile', username=entry.username) }}">{{ entry.username }}</a></td>
+                    <td class="score numbers">{{ entry.formatted_score }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -77,22 +92,22 @@
         <hr>
     </div>
     <div class="tab-pane fade" id="other-months" role="tabpanel" aria-labelledby="other-months-tab">
-    {% for result in results %}
+    {% for result in monthly_results %}
         <h3>{{ result.header }}</h3>
         <table class="table table-hover table-sm shadow p-3 mb-5 bg-white rounded">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">użytkownik</th>
-                    <th scope="col">liczba zwycięstw</th>
+                    <th scope="col" class="score numbers">liczba punktów</th>
                 </tr>
             </thead>
             <tbody>
             {% for entry in result.data_results %}
                 <tr {% if loop.first %}class="first-place"{% endif %}>
                     <th scope="row">{{ loop.index }}</th>
-                    <td><a href="{{ url_for('user.profile', username=entry[0]) }}">{{ entry[0] }}</a></td>
-                    <td>{{ entry[1] }}</td>
+                    <td><a href="{{ url_for('user.profile', username=entry.username) }}">{{ entry.username }}</a></td>
+                    <td class="score numbers">{{ entry.formatted_score }}</td>
                 </tr>
             {% endfor %}
             </tbody>

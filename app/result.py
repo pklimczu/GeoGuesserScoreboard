@@ -16,6 +16,7 @@ class UserResultPair:
         self.username = ""
         self.user_uuid = 0
         self.score = 0
+        self.formatted_score = ""
 
     def get_uuid_from_name(self):
         db = get_db()
@@ -27,6 +28,7 @@ def get_name_from_uuid(uuid):
     db = get_db()
     user = db.execute("SELECT * FROM user WHERE uuid = '{}'".format(uuid)).fetchone()
     if user:
+        print(user['username'])
         return user['username']
     return "unknown"
 
@@ -45,6 +47,18 @@ class GameEntry:
         self.third_place = 0
         self.no_players = 0
 
+class MonthResultPair:
+    def __init__(self):
+        self.month_ago = 0
+        self.data_results = []
+
+    def get_header(self):
+        months = {1:"styczeń", 2:"luty", 3:"marzec", 4:"kwiecień", 5:"maj", 6:"czerwiec", 7:"lipiec", 8:"sierpień", 9:"wrzesień", 10:"październik", 11:"listopad", 12:"grudzień"}
+        difference = datetime.date.today() - datetime.timedelta(30*self.month_ago)
+        month = str(months[difference.month])
+        year = str(difference.year)
+        self.header = month + " " + year 
+
 def get_sorted_results(formula):
     db = get_db()
     output = db.execute(formula)
@@ -60,7 +74,6 @@ def get_sorted_results(formula):
     return sorted_results
 
 def get_all_games_counted(sorted_results):
-    print(sorted_results)
     new_structure = []
     db = get_db()
     for entry in sorted_results:
@@ -68,6 +81,32 @@ def get_all_games_counted(sorted_results):
         played_games = db.execute("SELECT COUNT(*) FROM result WHERE user_uuid = '{}'".format(user_uuid)).fetchone()
         new_structure.append([*entry, played_games[0]])
     return new_structure
+
+def get_points_results_for_formula(formula):
+    db = get_db()
+    related_games = db.execute(formula).fetchall()
+    inter_results = {}
+
+    for related_game in related_games:
+        formula = "SELECT * FROM result WHERE game_uuid = '{}'".format(related_game['uuid'])
+        results = db.execute(formula).fetchall()
+        for result in results:
+            user_uuid = result['user_uuid']
+            if user_uuid in inter_results:
+                inter_results[user_uuid] += result['score']
+            else:
+                inter_results[user_uuid] = result['score']
+    return_results = []
+
+    # change uuid to username
+    for result in inter_results:
+        urp = UserResultPair()
+        urp.username = get_name_from_uuid(result)
+        urp.score = round(inter_results[result]/1000,3)
+        urp.formatted_score = "{0:.3f}".format(urp.score)
+        return_results.append(urp)
+    return_results.sort(key = lambda x: x.score, reverse=True)
+    return return_results
 
 def get_winner_and_results(request_form):
     db = get_db()
@@ -139,24 +178,13 @@ def get_month(number):
 
 @bp.route('/all_results')
 def all_results():
-    class MonthResultPair:
-        def __init__(self):
-            self.month_ago = 0
-            self.data_results = []
-
-        def get_header(self):
-            months = {1:"styczeń", 2:"luty", 3:"marzec", 4:"kwiecień", 5:"maj", 6:"czerwiec", 7:"lipiec", 8:"sierpień", 9:"wrzesień", 10:"październik", 11:"listopad", 12:"grudzień"}
-            difference = datetime.date.today() - datetime.timedelta(30*self.month_ago)
-            month = str(months[difference.month])
-            year = str(difference.year)
-            self.header = "Ranking " + month + " " + year 
-
     current_month_formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month') AND date('now', 'start of month', '+1 month', '-1 day');"
     all_time_formula = "SELECT * FROM game"
 
     current_month = get_sorted_results(current_month_formula)
     all_time = get_all_games_counted(get_sorted_results(all_time_formula))
 
+    # Month by month
     db = get_db()
     formula = "SELECT * FROM game ORDER BY datestamp"
     handler = db.execute(formula).fetchall()[0]
@@ -174,6 +202,57 @@ def all_results():
         results.append(result)
 
     return render_template('result/all_results.html', current_month=current_month, all_time=all_time, results=results)
+
+@bp.route('/points')
+@login_required
+def points():
+    db = get_db()
+    #################
+    # CURRENT MONTH #
+    #################
+    current_month_formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month') AND date('now', 'start of month', '+1 month', '-1 day');"
+    current_month = get_points_results_for_formula(current_month_formula)
+
+    ##################
+    # Month by month #
+    ##################
+    db = get_db()
+    formula = "SELECT * FROM game ORDER BY datestamp"
+    handler = db.execute(formula).fetchall()[0]
+    first_game = handler['datestamp']
+    today_date = datetime.date.today()
+    months = (today_date.year - first_game.year) * 12 + today_date.month - first_game.month
+
+    monthly_results = []
+    for i in range(1, months + 1):
+        formula = "SELECT * FROM game WHERE datestamp BETWEEN date('now', 'start of month', '-{} month') AND date('now', 'start of month', '-{} month', '-1 day');".format(i, i-1)
+        result = MonthResultPair()
+        result.month_ago = i
+        result.data_results = get_points_results_for_formula(formula)
+        result.get_header()
+        monthly_results.append(result)
+
+    #################
+    # TOTAL RESULTS #
+    #################
+    # Get all users
+    formula = "SELECT * FROM user"
+    all_users = db.execute(formula).fetchall()
+    
+    # Total results
+    total_results = []
+    for user in all_users:
+        formula = "SELECT * FROM result WHERE user_uuid = '{}'".format(user['uuid'])
+        all_points = db.execute(formula).fetchall()
+        total_result = round(sum([x['score'] for x in all_points])/1000,3)
+        if (total_result > 0):
+            urp = UserResultPair()
+            urp.username = user['username']
+            urp.score = total_result
+            urp.formatted_score = "{0:.3f}".format(total_result)
+            total_results.append(urp)
+    total_results.sort(key = lambda x: x.score, reverse=True)
+    return render_template('result/points.html', total_results=total_results, current_month=current_month, monthly_results=monthly_results)
 
 @bp.route('/add_by_link', methods=('GET', 'POST'))
 @login_required

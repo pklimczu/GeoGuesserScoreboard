@@ -32,7 +32,8 @@
         </div>
         {% if g.user['username'] == 'admin' %}
         <div style="width: 10%; text-align: right;">
-            <a href="{{ url_for('game.remove', game_id=game_id) }}">usuń</a>
+            <a href="{{ url_for('game.remove', game_id=game_id) }}">usuń</a><br>
+            <a href="#" id="change-date">zmień datę</a>
         </div>
         {% endif %}
     </div>
@@ -41,7 +42,7 @@
 {% endblock %}
 
 {% block content %}
-<table class="table table-hover table-striped">
+<table class="table table-hover table-striped shadow p-3 mb-5 bg-white rounded">
 
     <thead class="thead-dark">
         <tr>
@@ -71,4 +72,15 @@
     {% endfor %}
     </tbody>
 </table>
+<script src="{{ url_for('static', filename='ajaxify.js') }}"></script>
+<script>
+    document.getElementById("change-date").addEventListener("click", askChangeDate);
+
+    function askChangeDate() {
+        input_data = {}
+        input_data['new_date'] = prompt("Wprowadź nową datę w formace YYYY-MM-DD", "{{ date }}")
+        console.log(input_data['new_date'])
+        send_ajax("{{ url_for('game.update_date', game_id=game_id) }}")
+    }
+</script>
 {% endblock %}

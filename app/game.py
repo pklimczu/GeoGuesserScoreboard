@@ -1,7 +1,7 @@
-import functools, requests, yaml, uuid
+import functools, re, requests, yaml, uuid
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
+    Blueprint, flash, g, json, redirect, render_template, request, session, url_for, abort
 )
 
 from app.db import get_db
@@ -28,6 +28,13 @@ def uuid_to_playername(uuid):
         username = user['username']
     return username
 
+def check_if_dateformat_correct(string):
+    (year, month, day) = string.split("-")
+    if (len(year) is 4 and str(year).isdigit() and len(month) is 2 and str(month).isdigit() and len(day) is 2 and str(day).isdigit()):
+        return True
+    else:
+        return False
+
 @bp.route("/details/<game_id>")
 @login_required
 def details(game_id):
@@ -45,8 +52,25 @@ def details(game_id):
         player.score = fetched_player['score']
         player.get_lost(max_score)
         players.append(player)
+        
     return render_template('game/details.html', players=players, date=date, game_id=game_id)
 
+@bp.route("/update_date/<game_id>", methods=['POST'])
+@admin_required
+def update_date(game_id):
+    new_date = request.form['new_date']
+    try:
+        if check_if_dateformat_correct(new_date):
+            db = get_db()
+            formula = "UPDATE game SET datestamp = '{}' WHERE id = '{}'".format(new_date, game_id)
+            db.execute(formula)
+            db.commit()
+            return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+        else:
+            return abort(404)
+    except:
+        return abort(404)
+        
 @bp.route("/remove/<game_id>")
 @admin_required
 def remove(game_id):
