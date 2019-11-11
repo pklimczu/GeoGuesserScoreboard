@@ -28,7 +28,6 @@ def get_name_from_uuid(uuid):
     db = get_db()
     user = db.execute("SELECT * FROM user WHERE uuid = '{}'".format(uuid)).fetchone()
     if user:
-        print(user['username'])
         return user['username']
     return "unknown"
 
