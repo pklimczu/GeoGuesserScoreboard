@@ -122,18 +122,5 @@ def change_password():
 @bp.route('/script1')
 @admin_required
 def script1():
-    db = get_db()
-    formula = "SELECT * FROM game"
-    users = dict()
-    entries = db.execute(formula).fetchall()
-    for entry in entries:
-        user = entry['winner']
-        if user in users:
-            user_uuid = users[user]
-        else:
-            formula_user = "SELECT * FROM user WHERE username = '{}'".format(user)
-            user_uuid = db.execute(formula_user).fetchone()['uuid']
-        formula_update = "UPDATE game SET winner = '{}' WHERE id = '{}'".format(user_uuid, entry['id'])
-        db.execute(formula_update)
-        db.commit()
+
     return redirect(url_for('manage.control_panel'))
