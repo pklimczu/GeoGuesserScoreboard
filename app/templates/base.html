@@ -27,9 +27,7 @@
             <ul class="navbar-nav ml-auto">
                 {% if g.user %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('user.profile', username=g.user['username']) }}"><button class="btn btn-outline-light">{{ g.user['username'] }}</button></a></li>
-                {% if g.user['username'] == 'admin' %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('manage.control_panel') }}"><button class="btn btn-outline-light">&#9634;</button></a></li>
-                {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}"><button class="btn btn-outline-light">wyloguj się</button></a></li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}"><button class="btn btn-outline-light">logowanie</button></a></li>
