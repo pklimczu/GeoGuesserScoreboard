@@ -107,10 +107,10 @@
             <!--GAME INFO-->
             <td class="smaller vertically">
                 {% if game_entry.map_url|length %}
-                <a href="{{ game_entry.map_url }}">link do mapy ({{ game_entry.map_url[-5:] }})</a><br/>
+                <a href="{{ game_entry.map_url }}" target="_blank">link do mapy ({{ game_entry.map_url[-5:] }})</a><br/>
                 {% endif %}
                 {% if game_entry.game_url|length %}
-                <a href="{{ game_entry.game_url }}">challenge</a>,
+                <a href="{{ game_entry.game_url }}" target="_blank">challenge</a>,
                 {% endif %}
                 <a href="{{ url_for('game.details', game_id=game_entry.id) }}">szczegóły</a>
             </td>
