@@ -45,6 +45,7 @@ class GameEntry:
         self.second_place = 0
         self.third_place = 0
         self.no_players = 0
+        self.have_I_played = False
 
 class MonthResultPair:
     def __init__(self):
@@ -358,6 +359,16 @@ def winners():
         player.lost = result['score'] - best_score
         return player
 
+    def have_player_played(players_sql):
+        players_uuids = []
+        for player in players_in_game:
+            players_uuids.append(player['user_uuid'])
+        user_uuid = g.user['uuid']
+        if user_uuid in players_uuids:
+            return True
+        else:
+            return False
+
     def get_date(datestamp):
         (year, month, day) = str(datestamp).split("-")
         return (day, get_month(month) + " " + year)
@@ -385,6 +396,9 @@ def winners():
         players_in_game_formula = "SELECT * FROM result WHERE game_uuid = '{}' ORDER BY score DESC".format(game_entry.uuid)
         players_in_game = db.execute(players_in_game_formula).fetchall()
         game_entry.no_players = len(players_in_game)
+
+        # Check if current player played that map
+        game_entry.have_I_played = have_player_played(players_in_game)
 
         best_results = players_in_game[:3]
         best_score = best_results[0]['score']

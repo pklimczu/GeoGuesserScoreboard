@@ -68,8 +68,9 @@
             <th style="width: 21%;">zwycięzca</th>
             <th style="width: 21%;">#2</th>
             <th style="width: 21%;">#3</th>
-            <th style="width: 6%;" class="no_players">#&#9822;</th>
-            <th style="width: 16%;">info</th>
+            <th style="width: 13%;">info</th>
+            <th style="width: 4%;" class="no_players">#&#9822;</th>
+            <th style="width: 5%;">grane?</th>
             <th style="width: 5%; text-align: center;" >&#x21bb;</th>
         </tr>
     </thead>
@@ -96,14 +97,6 @@
                 <span class="user">{{ game_entry.third_place.name }}</span><br/>
                 <span class="score red-font">{{ game_entry.third_place.lost }}</span>
             </td>
-            <!--NUMBER OF PLAYERS-->
-            <td class="vertically no_players">
-                {% if game_entry.no_players > 3 %}
-                <span class="more-than-3">({{ game_entry.no_players }})</span>
-                {% else %}
-                ({{ game_entry.no_players }})
-                {% endif %}
-            </td>
             <!--GAME INFO-->
             <td class="smaller vertically">
                 {% if game_entry.map_url|length %}
@@ -113,6 +106,22 @@
                 <a href="{{ game_entry.game_url }}" target="_blank">challenge</a>,
                 {% endif %}
                 <a href="{{ url_for('game.details', game_id=game_entry.id) }}">szczegóły</a>
+            </td>            
+            <!--NUMBER OF PLAYERS-->
+            <td class="vertically no_players">
+                {% if game_entry.no_players > 3 %}
+                <span class="more-than-3">({{ game_entry.no_players }})</span>
+                {% else %}
+                ({{ game_entry.no_players }})
+                {% endif %}
+            </td>
+            <!--PLAYED?-->
+            <td class="vertically no_players">
+                {% if game_entry.have_I_played %}
+                <span style="color: #5BB374;">&#9628;</span>
+                {% else %}
+                <span style="color: #CC7070;">&#9625;</span>
+                {% endif %}
             </td>
             <!--REFRESH-->
             <td class="vertically" style="text-align: center;"><a href="{{ url_for('result.update_game', game_uuid=game_entry.uuid) }}">&#x21bb;</a></td>
