@@ -128,20 +128,20 @@ def get_winner_and_results(request_form):
 def link_parser(link):
     content = requests.get(link).content
     content = content.decode('utf-8')
-    query_string = "window.apiModel = "
-    start = content.find(query_string) + len(query_string)
-    end = content[start:].find("};") + 1
+    query_string = "props"
+    start = content.find(query_string) - 2 # To catch {"
+    end = content[start:].find("script") - 2
 
     parsed = yaml.load(content[start:start+end])
-    map_id = parsed['mapSlug']
-    keyword = 'hiScores'
-    results = parsed[keyword]
+    # map_id = ""parsed["props"]["pageProps"]["gamePlayedByCurrentUser"]["map"]
+    map_id = ""
+    results = parsed["props"]["pageProps"]["highscore"]
     return_list = []
     winner = []
     for entry in results:
         user_result_pair = UserResultPair()
-        user_result_pair.username = entry['playerName']
-        user_result_pair.score = entry['totalScore']
+        user_result_pair.username = entry['userNick']
+        user_result_pair.score = entry['points']
         user_result_pair.get_uuid_from_name()
         if user_result_pair.user_uuid:
             return_list.append(user_result_pair)
