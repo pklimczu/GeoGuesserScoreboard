@@ -38,6 +38,7 @@ class GameEntry:
         self.date = ""
         self.map_url = ""
         self.game_url = ""
+        self.results_url = ""
         self.results = []
         self.winner = ""
         self.uuid = ""
@@ -167,7 +168,7 @@ def get_url_to_map(url_hash):
 
 def get_url_to_challenge(url_hash):
     if len(url_hash) > 0:
-        return "https://geoguessr.com/challenge/" + url_hash
+        return ("https://geoguessr.com/challenge/" + url_hash, "https://geoguessr.com/results/" + url_hash)
     else:
         return ""   
 
@@ -412,7 +413,7 @@ def winners():
         # Parsing link to challenge
         game_hash_obj = db.execute("SELECT * FROM link WHERE game_uuid = '{}'".format(game_entry.uuid)).fetchone()
         if game_hash_obj:
-            game_entry.game_url = get_url_to_challenge(game_hash_obj['game_hash'])
+            (game_entry.game_url, game_entry.results_url) = get_url_to_challenge(game_hash_obj['game_hash'])
         
         results.append(game_entry)
 
