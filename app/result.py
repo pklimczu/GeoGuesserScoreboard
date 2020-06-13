@@ -8,6 +8,8 @@ from app.db import get_db
 
 from app.auth import login_required, admin_required
 
+from .tools import parser as Parser
+
 bp = Blueprint('result', __name__, url_prefix='/result')
 
 class UserResultPair:
@@ -129,20 +131,19 @@ def get_winner_and_results(request_form):
 def link_parser(link):
     content = requests.get(link).content
     content = content.decode('utf-8')
-    query_string = "props"
-    start = content.find(query_string) - 2 # To catch {"
-    end = content[start:].find("script") - 2
 
-    parsed = yaml.load(content[start:start+end])
-    # map_id = ""parsed["props"]["pageProps"]["gamePlayedByCurrentUser"]["map"]
+    parser = Parser.MyHTMLParser()
+    parser.initialize()
+    parser.feed(str(content))
+
     map_id = ""
-    results = parsed["props"]["pageProps"]["highscore"]
+    results = parser.results()
     return_list = []
     winner = []
     for entry in results:
         user_result_pair = UserResultPair()
-        user_result_pair.username = entry['userNick']
-        user_result_pair.score = entry['points']
+        user_result_pair.username = entry[0]
+        user_result_pair.score = int(entry[1])
         user_result_pair.get_uuid_from_name()
         if user_result_pair.user_uuid:
             return_list.append(user_result_pair)
